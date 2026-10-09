@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>业务数据 AI 管控与溯源平台</title>
+</head>
+
+<body>
+
+    <!-- =========================
+         登录页面
+    ========================== -->
+    <section
+        id="login-screen"
+        class="login-screen"
+    >
+
+        <div class="login-card">
+
+            <div class="login-logo">
+                DS
+            </div>
+
+            <h1>
+                业务数据 AI 管控与溯源
+            </h1>
+
+            <p>
+                Business Data Security Platform
+            </p>
+
+            <form id="login-form">
+
+                <label for="username">
+                    用户名
+                </label>
+
+                <input
+                    id="username"
+                    type="text"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">
+                    密码
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    id="login-button"
+                    type="submit"
+                    class="primary-button"
+                >
+                    登录系统
+                </button>
+
+                <div
+                    id="login-error"
+                    class="error-text"
+                    role="alert"
+                ></div>
+
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         系统主页面
+    ========================== -->
+    <section
+        id="app-screen"
+        hidden
+    >
+
+        <!-- 顶部栏 -->
+        <header class="topbar">
+
+            <div class="brand">
+
+                <span class="brand-icon">
+                    DS
+                </span>
+
+                <span>
+                    业务数据 AI 管控与溯源平台
+                </span>
+
+            </div>
+
+            <div class="topbar-right">
+
+                <span id="current-user"></span>
+
+                <button
+                    id="logout-button"
+                    type="button"
+                    class="secondary-button"
+                >
+                    退出登录
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <div class="app-layout">
+
+            <!-- 左侧导航 -->
+            <aside class="sidebar">
+
+                <div class="sidebar-title">
+                    安全管理
+                </div>
+
+                <nav aria-label="主导航">
+
+                    <button
+                        type="button"
+                        class="nav-button active"
+                        data-view="customers"
+                        data-roles="admin,analyst"
+                    >
+                        业务数据访问
+                    </button>
+
+                    <button
+                        type="button"
+                        class="nav-button"
+                        data-view="policies"
+                        data-roles="admin"
+                    >
+                        安全策略
+                    </button>
+
+                    <button
+                        type="button"
+                        class="nav-button"
+                        data-view="audit"
+                        data-roles="admin"
+                    >
+                        行为审计
+                    </button>
+                </nav>
+
+                <div class="sidebar-footer">
+                    Platform V1.0
+                </div>
+
+            </aside>
+
+
+            <!-- 页面主体 -->
+            <main class="main-content">
+
+                <div class="page-header">
+
+                    <div>
+
+                        <h2 id="page-title">
+                            业务数据访问
+                        </h2>
+
+                        <p id="page-description">
+                            查看权限控制后的业务数据
+                        </p>
+
+                    </div>
+
+                    <button
+                        id="refresh-button"
+                        type="button"
+                        class="secondary-button"
+                    >
+                        刷新数据
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="status-message"
+                    class="status-message"
+                    role="status"
+                ></div>
+
+
+                <div class="content-card">
+
+                    <div id="content"></div>
+
+                </div>
+
+            </main>
+
+        </div>
+
+    </section>
+
+
+    <!-- 前端入口 -->
+    <script
+        type="module"
+        src="/src/main.js"
+    ></script>
+
+</body>
+
+</html>
