@@ -16,6 +16,13 @@ from app.modules.auth.router import router as auth_router
 from app.modules.customers.router import router as customer_router
 from app.modules.policy.router import router as policy_router
 from app.modules.audit.router import router as audit_router
+from app.modules.systems.router import (
+    router as systems_router,
+)
+
+from app.modules.data_sources.router import (
+    router as data_sources_router,
+)
 
 
 app = FastAPI(
@@ -91,6 +98,8 @@ app.include_router(auth_router)
 app.include_router(customer_router)
 app.include_router(policy_router)
 app.include_router(audit_router)
+app.include_router(systems_router)
+app.include_router(data_sources_router)
 
 
 @app.get("/api/v1/health", tags=["System"])
