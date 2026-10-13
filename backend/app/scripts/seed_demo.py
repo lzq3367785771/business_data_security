@@ -316,6 +316,100 @@ def main():
         )
 
 
+        create_policy(
+            db=db,
+            name="凭据创建策略",
+            resource="credential:create",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+
+        create_policy(
+            db=db,
+            name="凭据列表查看策略",
+            resource="credential:list",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+
+        create_policy(
+            db=db,
+            name="数据源连接测试策略",
+            resource="datasource:test_connection",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+
+        create_policy(
+            db=db,
+            name="数据源元数据扫描策略",
+            resource="datasource:scan_metadata",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+
+        create_policy(
+            db=db,
+            name="数据资产同步策略",
+            resource="datasource:sync_assets",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+        create_policy(
+            db=db,
+            name="敏感字段自动识别策略",
+            resource="sensitive:detect",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+        create_policy(
+            db=db,
+            name="敏感字段内容识别策略",
+            resource="sensitive:content_detect",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+        create_policy(
+            db=db,
+            name="敏感字段列表查询策略",
+            resource="sensitive:list",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+        create_policy(
+            db=db,
+            name="敏感字段人工复核策略",
+            resource="sensitive:review",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
+        create_policy(
+            db=db,
+            name="资产目录查询策略",
+            resource="asset:list",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+        )
+
         # -------------------------
         # 演示客户数据
         # -------------------------

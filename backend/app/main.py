@@ -19,10 +19,20 @@ from app.modules.audit.router import router as audit_router
 from app.modules.systems.router import (
     router as systems_router,
 )
-
 from app.modules.data_sources.router import (
     router as data_sources_router,
 )
+from app.modules.credentials.router import (
+    router as credentials_router,
+)
+from app.modules.assets.router import (
+    router as assets_router,
+)
+from app.modules.sensitive_detection.router import (
+    router as sensitive_detection_router,
+)
+
+
 
 
 app = FastAPI(
@@ -36,7 +46,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=[
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ],
     allow_headers=[
         "Authorization",
         "Content-Type",
@@ -100,7 +117,9 @@ app.include_router(policy_router)
 app.include_router(audit_router)
 app.include_router(systems_router)
 app.include_router(data_sources_router)
-
+app.include_router(credentials_router)
+app.include_router(assets_router)
+app.include_router(sensitive_detection_router)
 
 @app.get("/api/v1/health", tags=["System"])
 def health(request: Request):

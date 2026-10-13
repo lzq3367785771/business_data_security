@@ -1,0 +1,267 @@
+/* =========================
+   敏感数据管理页面
+========================= */
+
+.sensitive-page {
+    width: 100%;
+}
+
+
+/* =========================
+   统计卡片
+========================= */
+
+.sensitive-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(140px, 1fr)
+        );
+
+    gap: 14px;
+
+    margin-bottom: 22px;
+}
+
+
+.sensitive-stat-card {
+    padding: 18px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    background: #f8fafc;
+}
+
+
+.sensitive-stat-value {
+    margin-bottom: 6px;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.sensitive-stat-label {
+    font-size: 13px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================
+   筛选栏
+========================= */
+
+.sensitive-toolbar {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+.sensitive-toolbar-left {
+    display: flex;
+
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+
+.sensitive-filter-select {
+    min-width: 150px;
+
+    padding: 9px 12px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #334155;
+
+    outline: none;
+}
+
+
+.sensitive-filter-select:focus {
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================
+   敏感等级标签
+========================= */
+
+.sensitive-level-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.sensitive-level-L1 {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+
+.sensitive-level-L2 {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+
+.sensitive-level-L3 {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+
+.sensitive-level-L4 {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+
+/* =========================
+   复核状态
+========================= */
+
+.review-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.review-pending {
+    background: #fff7ed;
+    color: #c2410c;
+}
+
+
+.review-confirmed {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+
+.review-rejected {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+
+/* =========================
+   操作按钮
+========================= */
+
+.sensitive-action-group {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+}
+
+
+.sensitive-action-button {
+    padding: 6px 10px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-size: 12px;
+}
+
+
+.action-confirm {
+    color: #047857;
+
+    border-color: #a7f3d0;
+}
+
+
+.action-confirm:hover:not(:disabled) {
+    background: #ecfdf5;
+}
+
+
+.action-reject {
+    color: #b91c1c;
+
+    border-color: #fecaca;
+}
+
+
+.action-reject:hover:not(:disabled) {
+    background: #fef2f2;
+}
+
+
+/* =========================
+   响应式
+========================= */
+
+@media (max-width: 900px) {
+
+    .sensitive-stats {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(140px, 1fr)
+            );
+    }
+
+
+    .sensitive-toolbar {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .sensitive-stats {
+        grid-template-columns: 1fr;
+    }
+}

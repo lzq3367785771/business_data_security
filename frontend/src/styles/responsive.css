@@ -1,0 +1,44 @@
+@media (max-width: 768px) {
+
+    .topbar {
+        height: auto;
+
+        padding: 14px 16px;
+
+        flex-wrap: wrap;
+
+        gap: 12px;
+    }
+
+
+    .app-layout {
+        flex-direction: column;
+    }
+
+
+    .sidebar {
+        width: 100%;
+    }
+
+
+    .sidebar-footer {
+        display: none;
+    }
+
+
+    .main-content {
+        padding: 16px;
+    }
+
+
+    .page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .login-card {
+        padding: 28px;
+    }
+}

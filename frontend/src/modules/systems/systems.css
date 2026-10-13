@@ -1,0 +1,418 @@
+.systems-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.systems-stat-card {
+    padding: 18px 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.systems-stat-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.systems-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.systems-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.systems-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.systems-table th,
+.systems-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.systems-table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.system-status-active {
+    font-weight: 600;
+}
+
+.system-status-inactive {
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+
+    .systems-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================================
+   页面工具栏
+================================ */
+
+.systems-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.systems-toolbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* ================================
+   表格操作按钮
+================================ */
+
+.system-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.system-action-button {
+    min-width: 54px;
+    padding: 6px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-size: 13px;
+    font-family: inherit;
+
+    color: #374151;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.system-action-button:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+
+/* 停用 */
+.system-action-danger {
+    color: #dc2626;
+}
+
+.system-action-danger:hover {
+    color: #b91c1c;
+    border-color: #fecaca;
+    background: #fef2f2;
+}
+
+
+/* 启用 */
+.system-action-enable {
+    color: #15803d;
+}
+
+.system-action-enable:hover {
+    color: #166534;
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+
+/* ================================
+   弹窗遮罩
+================================ */
+
+.system-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background:
+        rgba(15, 23, 42, 0.45);
+
+    z-index: 1000;
+}
+
+
+/* ================================
+   弹窗主体
+================================ */
+
+.system-modal {
+    width: min(720px, 100%);
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px
+        rgba(15, 23, 42, 0.2);
+}
+
+
+/* ================================
+   弹窗标题
+================================ */
+
+.system-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 24px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+}
+
+.system-modal-header h3 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #111827;
+}
+
+.system-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-size: 24px;
+    line-height: 1;
+
+    color: #6b7280;
+
+    cursor: pointer;
+}
+
+.system-modal-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+
+/* ================================
+   表单区域
+================================ */
+
+.system-form {
+    padding: 22px 24px 10px;
+}
+
+.system-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 20px;
+
+    margin-bottom: 18px;
+}
+
+
+/* 单个字段 */
+.system-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.system-form-field > span {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+/* 输入框 / 下拉框 / 文本框 */
+.system-form-field input,
+.system-form-field select,
+.system-form-field textarea {
+    width: 100%;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+    font-family: inherit;
+
+    color: #111827;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.system-form-field input,
+.system-form-field select {
+    height: 42px;
+
+    padding: 0 12px;
+}
+
+.system-form-field textarea {
+    min-height: 96px;
+
+    padding: 10px 12px;
+
+    resize: vertical;
+}
+
+
+/* 聚焦 */
+.system-form-field input:focus,
+.system-form-field select:focus,
+.system-form-field textarea:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.12);
+}
+
+
+/* placeholder */
+.system-form-field input::placeholder,
+.system-form-field textarea::placeholder {
+    color: #9ca3af;
+}
+
+
+/* ================================
+   错误提示
+================================ */
+
+.system-form-error {
+    min-height: 20px;
+
+    margin-top: 12px;
+
+    font-size: 13px;
+
+    color: #dc2626;
+}
+
+
+/* ================================
+   弹窗底部
+================================ */
+
+.system-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin: 22px -24px -10px;
+
+    padding: 16px 24px 20px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+
+/* ================================
+   移动端
+================================ */
+
+@media (max-width: 768px) {
+
+    .systems-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .systems-toolbar .primary-button {
+        width: 100%;
+    }
+
+    .system-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .system-modal-overlay {
+        padding: 12px;
+    }
+
+    .system-modal-header,
+    .system-form,
+    .system-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .system-modal-footer {
+        flex-direction: column-reverse;
+    }
+
+    .system-modal-footer button {
+        width: 100%;
+    }
+}
+
+.system-form-field input.system-form-readonly {
+    color: #64748b;
+    background: #f1f5f9;
+    cursor: not-allowed;
+}

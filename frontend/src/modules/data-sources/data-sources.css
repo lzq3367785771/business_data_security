@@ -1,0 +1,511 @@
+/* ================================
+   数据源页面工具栏
+================================ */
+
+.data-sources-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    margin-bottom: 18px;
+}
+
+.data-sources-toolbar-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+
+/* ================================
+   统计卡片
+================================ */
+
+.data-sources-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+.data-sources-stat-card {
+    padding: 18px 20px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    background: #ffffff;
+}
+
+.data-sources-stat-label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 13px;
+
+    color: #6b7280;
+}
+
+.data-sources-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+
+    color: #111827;
+}
+
+
+/* ================================
+   数据源表格
+================================ */
+
+.data-sources-table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+.data-sources-table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+.data-sources-table th,
+.data-sources-table td {
+    padding: 12px 14px;
+
+    border-bottom:
+        1px solid #e5e7eb;
+
+    text-align: left;
+
+    white-space: nowrap;
+}
+
+.data-sources-table th {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #4b5563;
+
+    background: #f9fafb;
+}
+
+.data-sources-table td {
+    font-size: 14px;
+
+    color: #374151;
+}
+
+.data-sources-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* ================================
+   数据源状态
+================================ */
+
+.data-source-status-active {
+    font-weight: 600;
+
+    color: #15803d;
+}
+
+.data-source-status-inactive {
+    font-weight: 600;
+
+    color: #6b7280;
+}
+
+
+/* ================================
+   操作按钮
+================================ */
+
+.data-source-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.data-source-action-button {
+    min-width: 54px;
+
+    padding: 6px 12px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    font-size: 13px;
+    font-family: inherit;
+
+    color: #374151;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.data-source-action-button:hover {
+    background: #f3f4f6;
+
+    border-color: #9ca3af;
+}
+
+
+/* 停用 */
+.data-source-action-danger {
+    color: #dc2626;
+}
+
+.data-source-action-danger:hover {
+    color: #b91c1c;
+
+    border-color: #fecaca;
+
+    background: #fef2f2;
+}
+
+
+/* 启用 */
+.data-source-action-enable {
+    color: #15803d;
+}
+
+.data-source-action-enable:hover {
+    color: #166534;
+
+    border-color: #bbf7d0;
+
+    background: #f0fdf4;
+}
+
+
+/* ================================
+   移动端
+================================ */
+
+@media (max-width: 900px) {
+
+    .data-sources-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .data-sources-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .data-sources-toolbar .primary-button {
+        width: 100%;
+    }
+}
+
+
+/* ========================================
+   数据源弹窗遮罩
+======================================== */
+
+.data-source-modal-overlay {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(15, 23, 42, 0.45);
+
+    z-index: 1000;
+}
+
+
+/* ========================================
+   数据源弹窗主体
+======================================== */
+
+.data-source-modal {
+    width: min(820px, 100%);
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 20px 50px
+        rgba(15, 23, 42, 0.22);
+}
+
+
+/* ========================================
+   弹窗标题
+======================================== */
+
+.data-source-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 20px 24px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.data-source-modal-header h3 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #111827;
+}
+
+.data-source-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 34px;
+    height: 34px;
+
+    padding: 0;
+
+    border: none;
+    border-radius: 6px;
+
+    background: transparent;
+
+    font-size: 24px;
+    line-height: 1;
+
+    color: #6b7280;
+
+    cursor: pointer;
+}
+
+.data-source-modal-close:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+
+/* ========================================
+   表单主体
+======================================== */
+
+.data-source-form {
+    padding: 22px 24px 10px;
+}
+
+.data-source-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px 20px;
+
+    margin-bottom: 18px;
+}
+
+
+/* ========================================
+   单个表单字段
+======================================== */
+
+.data-source-form-field {
+    display: flex;
+    flex-direction: column;
+
+    gap: 7px;
+
+    min-width: 0;
+}
+
+.data-source-form-field > span {
+    font-size: 13px;
+    font-weight: 600;
+
+    color: #374151;
+}
+
+
+/* ========================================
+   输入框 / 下拉框 / 文本框
+======================================== */
+
+.data-source-form-field input,
+.data-source-form-field select,
+.data-source-form-field textarea {
+    width: 100%;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 14px;
+    font-family: inherit;
+
+    color: #111827;
+
+    outline: none;
+
+    box-sizing: border-box;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.data-source-form-field input,
+.data-source-form-field select {
+    height: 42px;
+
+    padding: 0 12px;
+}
+
+.data-source-form-field textarea {
+    min-height: 96px;
+
+    padding: 10px 12px;
+
+    resize: vertical;
+}
+
+
+/* 聚焦状态 */
+.data-source-form-field input:focus,
+.data-source-form-field select:focus,
+.data-source-form-field textarea:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37, 99, 235, 0.12);
+}
+
+
+/* placeholder */
+.data-source-form-field input::placeholder,
+.data-source-form-field textarea::placeholder {
+    color: #9ca3af;
+}
+
+
+/* ========================================
+   只读字段
+======================================== */
+
+.data-source-form-field input.data-source-form-readonly {
+    color: #64748b;
+
+    background: #f1f5f9;
+
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   表单错误信息
+======================================== */
+
+.data-source-form-error {
+    min-height: 20px;
+
+    margin-top: 12px;
+
+    font-size: 13px;
+
+    color: #dc2626;
+}
+
+
+/* ========================================
+   弹窗底部按钮区域
+======================================== */
+
+.data-source-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    /*
+     * footer 在 form 内部，
+     * 用负 margin 让分割线铺满弹窗宽度。
+     */
+    margin:
+        22px -24px -10px;
+
+    padding:
+        16px 24px 20px;
+
+    border-top:
+        1px solid #e5e7eb;
+}
+
+
+/* ========================================
+   disabled
+======================================== */
+
+.data-source-modal button:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* ========================================
+   移动端
+======================================== */
+
+@media (max-width: 768px) {
+
+    .data-source-modal-overlay {
+        padding: 12px;
+    }
+
+    .data-source-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .data-source-modal-header,
+    .data-source-form {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .data-source-modal-footer {
+        flex-direction: column-reverse;
+
+        margin-left: -16px;
+        margin-right: -16px;
+
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .data-source-modal-footer button {
+        width: 100%;
+    }
+}

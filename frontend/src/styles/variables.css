@@ -1,0 +1,27 @@
+:root {
+    font-family:
+        "Microsoft YaHei",
+        "PingFang SC",
+        Arial,
+        sans-serif;
+
+    color: #1e293b;
+
+    background: #f3f6fb;
+
+    font-synthesis: none;
+
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+
+    --sidebar: #14243a;
+    --sidebar-hover: #203956;
+
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
+
+    --border: #e2e8f0;
+    --background: #f3f6fb;
+
+    --danger: #dc2626;
+}

@@ -1,0 +1,124 @@
+/* =========================
+   按钮
+========================= */
+
+.primary-button {
+    border: 0;
+
+    border-radius: 7px;
+
+    padding: 11px 18px;
+
+    background: var(--primary);
+
+    color: #ffffff;
+
+    font-weight: 600;
+}
+
+
+.primary-button:hover {
+    background: var(--primary-hover);
+}
+
+
+.secondary-button {
+    border: 1px solid #cbd5e1;
+
+    border-radius: 7px;
+
+    padding: 9px 15px;
+
+    background: #ffffff;
+
+    color: #334155;
+}
+
+
+.secondary-button:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================
+   错误提示
+========================= */
+
+.error-text {
+    min-height: 20px;
+
+    margin-top: 14px;
+
+    color: var(--danger);
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   表格
+========================= */
+
+.table-wrapper {
+    width: 100%;
+
+    overflow-x: auto;
+}
+
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+thead {
+    background: #f1f5f9;
+}
+
+
+th,
+td {
+    padding: 14px 15px;
+
+    text-align: left;
+
+    border-bottom: 1px solid #edf0f5;
+}
+
+
+th {
+    color: #475569;
+
+    font-weight: 600;
+}
+
+
+td {
+    color: #334155;
+}
+
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================
+   空状态
+========================= */
+
+.empty-state {
+    padding: 50px 20px;
+
+    text-align: center;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+}

@@ -1,0 +1,572 @@
+/* =========================
+   资产管理页面
+========================= */
+
+.assets-page {
+    width: 100%;
+}
+
+
+/* =========================
+   数据源头部
+========================= */
+
+.asset-source-header {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 20px;
+
+    margin-bottom: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+}
+
+
+.asset-source-title {
+    margin-bottom: 5px;
+
+    font-size: 17px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.asset-source-description {
+    font-size: 13px;
+
+    color: var(--text-secondary);
+}
+
+
+.asset-source-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    flex-wrap: wrap;
+}
+
+
+/* =========================
+   资产统计
+========================= */
+
+.asset-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(130px, 1fr)
+        );
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+.asset-stat-card {
+    padding: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+}
+
+
+.asset-stat-value {
+    margin-bottom: 5px;
+
+    font-size: 25px;
+
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.asset-stat-label {
+    font-size: 13px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================
+   操作结果
+========================= */
+
+.asset-operation-message {
+    min-height: 20px;
+
+    margin-bottom: 18px;
+
+    font-size: 13px;
+}
+
+
+.asset-operation-success {
+    color: #047857;
+}
+
+
+.asset-operation-error {
+    color: #b91c1c;
+}
+
+
+/* =========================
+   资产目录标题
+========================= */
+
+.asset-tree-header {
+    display: flex;
+
+    align-items: baseline;
+
+    gap: 12px;
+
+    margin-bottom: 12px;
+}
+
+
+.asset-tree-header h3 {
+    margin: 0;
+
+    font-size: 16px;
+
+    color: #0f172a;
+}
+
+
+.asset-tree-header span {
+    font-size: 12px;
+
+    color: var(--text-secondary);
+}
+
+
+/* =========================
+   数据库
+========================= */
+
+.asset-database-node {
+    margin-bottom: 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 9px;
+
+    overflow: hidden;
+
+    background: #ffffff;
+}
+
+
+.asset-database-summary {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 15px 17px;
+
+    cursor: pointer;
+
+    background: #f8fafc;
+}
+
+
+.asset-database-name {
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.asset-database-icon {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 26px;
+
+    border-radius: 6px;
+
+    background: var(--primary);
+
+    color: #ffffff;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* =========================
+   数据表
+========================= */
+
+.asset-tables {
+    padding: 12px;
+}
+
+
+.asset-table-node {
+    margin-bottom: 9px;
+
+    border: 1px solid #e8edf3;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+
+.asset-table-node:last-child {
+    margin-bottom: 0;
+}
+
+
+.asset-table-summary {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding: 12px 14px;
+
+    cursor: pointer;
+
+    background: #ffffff;
+}
+
+
+.asset-table-name {
+    font-weight: 600;
+
+    color: #334155;
+}
+
+
+/* =========================
+   Summary 公共
+========================= */
+
+.asset-tree-summary-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+
+.asset-tree-summary-meta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    color: var(--text-secondary);
+
+    font-size: 12px;
+}
+
+
+.asset-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    padding: 3px 7px;
+
+    border-radius: 999px;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   字段
+========================= */
+
+.asset-columns {
+    border-top: 1px solid #edf0f5;
+}
+
+
+.asset-column-row {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 18px;
+
+    min-height: 44px;
+
+    padding: 8px 14px 8px 28px;
+
+    border-bottom: 1px solid #f1f5f9;
+}
+
+
+.asset-column-row:last-child {
+    border-bottom: 0;
+}
+
+
+.asset-column-row:hover {
+    background: #f8fafc;
+}
+
+
+.asset-column-name {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    min-width: 180px;
+}
+
+
+.asset-column-icon {
+    width: 18px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+.asset-column-name-text {
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size: 13px;
+
+    color: #334155;
+}
+
+
+.asset-column-meta {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    flex-wrap: wrap;
+}
+
+
+.asset-type-badge {
+    background: #eff6ff;
+
+    color: #1d4ed8;
+}
+
+
+.asset-primary-badge {
+    background: #fff7ed;
+
+    color: #c2410c;
+}
+
+
+.asset-nullable-badge {
+    background: #f8fafc;
+
+    color: #64748b;
+}
+
+
+.asset-not-null-badge {
+    background: #ecfdf5;
+
+    color: #047857;
+}
+
+
+/* =========================
+   响应式
+========================= */
+
+@media (max-width: 900px) {
+
+    .asset-stats {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(130px, 1fr)
+            );
+    }
+
+
+    .asset-source-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .asset-column-row {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .asset-column-meta {
+        justify-content: flex-start;
+
+        padding-left: 26px;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .asset-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ================================
+   业务系统 / 数据源选择区域
+================================ */
+
+.assets-page .asset-selectors {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+
+    width: 100%;
+    margin-bottom: 22px;
+    padding: 18px 20px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+
+/* 单个选择项 */
+.assets-page .asset-select-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    min-width: 0;
+}
+
+
+/* 标签 */
+.assets-page .asset-select-label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
+
+    color: #475569;
+}
+
+
+/* 下拉框 */
+.assets-page .asset-select {
+    width: 100%;
+    height: 42px;
+
+    padding: 0 38px 0 12px;
+
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+
+    background-color: #ffffff;
+
+    font-size: 14px;
+    font-family: inherit;
+
+    color: #1e293b;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+
+/* 鼠标经过 */
+.assets-page .asset-select:hover {
+    border-color: #94a3b8;
+}
+
+
+/* 点击选中 */
+.assets-page .asset-select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+/* 禁用状态 */
+.assets-page .asset-select:disabled {
+    color: #94a3b8;
+    background: #f1f5f9;
+
+    cursor: not-allowed;
+}
+
+
+/* 小屏幕自动变成一列 */
+@media (max-width: 900px) {
+
+    .assets-page .asset-selectors {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+}
