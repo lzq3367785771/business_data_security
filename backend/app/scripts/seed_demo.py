@@ -58,11 +58,16 @@ def create_policy(
     roles: list[str],
     mask_fields: list[str],
     priority: int,
+    update_existing: bool = False,
 ):
     """
-    创建安全策略。
+    创建或按需更新安全策略。
 
-    同名策略存在时直接跳过。
+    默认行为：
+        同名策略存在时跳过。
+
+    update_existing=True：
+        更新已有策略的基础配置。
     """
 
     exists = db.scalar(
@@ -72,7 +77,24 @@ def create_policy(
     )
 
     if exists is not None:
-        print(f"策略已存在，跳过：{name}")
+
+        if not update_existing:
+            print(
+                f"策略已存在，跳过：{name}"
+            )
+            return
+
+        exists.resource = resource
+        exists.allowed_roles = roles
+        exists.effect = "allow"
+        exists.mask_fields = mask_fields
+        exists.priority = priority
+        exists.enabled = True
+
+        print(
+            f"更新策略：{name}"
+        )
+
         return
 
     rule = PolicyRule(
@@ -87,7 +109,9 @@ def create_policy(
 
     db.add(rule)
 
-    print(f"创建策略：{name}")
+    print(
+        f"创建策略：{name}"
+    )
 
 
 def create_demo_customers(db):
@@ -229,9 +253,13 @@ def main():
             db=db,
             name="业务系统列表查看策略",
             resource="system:list",
-            roles=["admin"],
+            roles=[
+                "admin",
+                "analyst",
+            ],
             mask_fields=[],
             priority=100,
+            update_existing=True,
         )
 
         create_policy(
@@ -274,9 +302,13 @@ def main():
             db=db,
             name="数据源列表查看策略",
             resource="datasource:list",
-            roles=["admin"],
+            roles=[
+                "admin",
+                "analyst",
+            ],
             mask_fields=[],
             priority=100,
+            update_existing=True,
         )
 
         create_policy(
@@ -405,9 +437,39 @@ def main():
             db=db,
             name="资产目录查询策略",
             resource="asset:list",
-            roles=["admin"],
+            roles=[
+                "admin",
+                "analyst",
+            ],
             mask_fields=[],
             priority=100,
+            update_existing=True,
+        )
+        create_policy(
+            db=db,
+            name="真实业务数据预览策略",
+            resource="data_access:preview",
+            roles=[
+                "admin",
+                "analyst",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+
+
+        create_policy(
+            db=db,
+            name="异常访问监测查看策略",
+            resource="access_monitoring:list",
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
         )
 
         # -------------------------

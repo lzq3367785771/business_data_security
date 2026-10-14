@@ -20,6 +20,16 @@ export async function fetchSensitiveFields(
     );
 
 
+    // 数据源筛选
+    if (filters.sourceId) {
+
+        params.set(
+            "source_id",
+            filters.sourceId
+        );
+    }
+
+
     if (filters.reviewStatus) {
 
         params.set(

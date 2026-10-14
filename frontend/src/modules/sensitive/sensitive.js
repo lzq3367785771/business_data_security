@@ -9,11 +9,23 @@ import {
     renderSensitiveTable
 } from "./sensitive-table.js";
 
+import {
+    fetchSystems
+} from "../systems/systems-api.js";
+
+import {
+    fetchDataSources
+} from "../data-sources/data-sources-api.js";
+
 
 /*
  * 当前页面筛选状态
  */
 const filters = {
+
+    systemId: "",
+
+    sourceId: "",
 
     reviewStatus: "",
 
@@ -67,6 +79,86 @@ function createStatCard(
 
     return card;
 }
+
+
+function renderSystemOptions(
+    select,
+    systems
+) {
+
+    select.replaceChildren();
+
+    const allOption =
+        document.createElement("option");
+
+    allOption.value = "";
+    allOption.textContent =
+        "全部业务系统";
+
+    select.appendChild(allOption);
+
+
+    for (const system of systems) {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            String(system.id);
+
+        option.textContent =
+            `${system.system_name} (${system.system_code})`;
+
+        select.appendChild(option);
+    }
+
+
+    select.value =
+        filters.systemId;
+}
+
+
+function renderSourceOptions(
+    select,
+    sources,
+    showAll = true
+) {
+
+    select.replaceChildren();
+
+
+    if (showAll) {
+
+        const allOption =
+            document.createElement("option");
+
+        allOption.value = "";
+        allOption.textContent =
+            "全部数据源";
+
+        select.appendChild(allOption);
+    }
+
+
+    for (const source of sources) {
+
+        const option =
+            document.createElement("option");
+
+        option.value =
+            String(source.id);
+
+        option.textContent =
+            `${source.source_name} (${source.source_code})`;
+
+        select.appendChild(option);
+    }
+
+
+    select.value =
+        filters.sourceId;
+}
+
 
 
 /*
@@ -157,6 +249,42 @@ function createSensitivePage(
         "sensitive-toolbar-left";
 
 
+    const systemSelect =
+        createSelect(
+            [
+                {
+                    value: "",
+                    label: "全部业务系统"
+                }
+            ],
+            filters.systemId
+        );
+
+    systemSelect.id =
+        "sensitive-system-filter";
+
+
+    const sourceSelect =
+        createSelect(
+            [
+                {
+                    value: "",
+                    label: "全部数据源"
+                }
+            ],
+            filters.sourceId
+        );
+
+    sourceSelect.id =
+        "sensitive-source-filter";
+
+
+    sourceSelect.id =
+        "sensitive-source-filter";
+
+
+
+
     const reviewSelect =
         createSelect(
             [
@@ -212,6 +340,14 @@ function createSensitivePage(
     levelSelect.id =
         "sensitive-level-filter";
 
+
+    toolbarLeft.appendChild(
+        systemSelect
+    );
+
+    toolbarLeft.appendChild(
+        sourceSelect
+    );
 
     toolbarLeft.appendChild(
         reviewSelect
@@ -276,8 +412,13 @@ function createSensitivePage(
     return {
         stats,
         tableContainer,
+
+        systemSelect,
+        sourceSelect,
+
         reviewSelect,
         levelSelect,
+
         resetButton
     };
 }
@@ -461,6 +602,137 @@ export async function loadSensitive(
         );
 
 
+    const [
+        systemData,
+        sourceData
+    ] = await Promise.all([
+        fetchSystems(),
+        fetchDataSources()
+    ]);
+
+
+    const systems =
+        systemData.items || [];
+
+    const sources =
+        sourceData.items || [];
+
+
+    renderSystemOptions(
+        refs.systemSelect,
+        systems
+    );
+
+    renderSourceOptions(
+        refs.sourceSelect,
+        sources,
+        true
+    );
+
+
+refs.systemSelect.addEventListener(
+    "change",
+    async event => {
+
+        filters.systemId =
+            event.target.value;
+
+        filters.sourceId =
+            "";
+
+
+        /*
+         * 全部业务系统
+         */
+        if (!filters.systemId) {
+
+            const data =
+                await fetchDataSources();
+
+            renderSourceOptions(
+                refs.sourceSelect,
+                data.items || [],
+                true
+            );
+
+
+            await refreshSensitiveData(
+                context,
+                refs
+            );
+
+            return;
+        }
+
+
+        /*
+         * 指定业务系统
+         */
+        const data =
+            await fetchDataSources(
+                Number(filters.systemId)
+            );
+
+        const sources =
+            data.items || [];
+
+
+        renderSourceOptions(
+            refs.sourceSelect,
+            sources,
+            false
+        );
+
+
+        /*
+         * 当前业务系统没有数据源
+         */
+        if (sources.length === 0) {
+
+            refs.stats.replaceChildren();
+
+            refs.tableContainer.replaceChildren();
+
+            context.statusMessage.textContent =
+                "当前业务系统暂无数据源";
+
+            return;
+        }
+
+
+        /*
+         * 默认选择该业务系统第一个数据源
+         */
+        filters.sourceId =
+            String(sources[0].id);
+
+        refs.sourceSelect.value =
+            filters.sourceId;
+
+
+        await refreshSensitiveData(
+            context,
+            refs
+        );
+    }
+);
+
+    refs.sourceSelect.addEventListener(
+        "change",
+        async event => {
+
+            filters.sourceId =
+                event.target.value;
+
+            await refreshSensitiveData(
+                context,
+                refs
+            );
+        }
+    );
+
+
+
     refs.reviewSelect.addEventListener(
         "change",
         async event => {
@@ -495,24 +767,46 @@ export async function loadSensitive(
         "click",
         async () => {
 
-            filters.reviewStatus =
-                "";
+                filters.systemId =
+                    "";
 
-            filters.sensitivityLevel =
-                "";
+                filters.sourceId =
+                    "";
+
+                filters.reviewStatus =
+                    "";
+
+                filters.sensitivityLevel =
+                    "";
 
 
-            refs.reviewSelect.value =
-                "";
+                refs.systemSelect.value =
+                    "";
 
-            refs.levelSelect.value =
-                "";
+                refs.reviewSelect.value =
+                    "";
+
+                refs.levelSelect.value =
+                    "";
 
 
-            await refreshSensitiveData(
-                context,
-                refs
-            );
+                const sourceData =
+                    await fetchDataSources();
+
+                renderSourceOptions(
+                    refs.sourceSelect,
+                    sourceData.items || [],
+                    true
+                );
+
+                refs.sourceSelect.value =
+                    "";
+
+
+                await refreshSensitiveData(
+                    context,
+                    refs
+                );
         }
     );
 

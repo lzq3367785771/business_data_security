@@ -3,7 +3,10 @@ from uuid import uuid4
 from fastapi import Request
 from sqlalchemy.orm import Session
 
-from app.db.models import User, AuditEvent
+from app.db.models import (
+    User,
+    AuditEvent,
+)
 
 
 def write_audit(
@@ -14,7 +17,8 @@ def write_audit(
     resource: str,
     result: str,
     policy_id: int | None = None,
-    object_count: int = 0
+    object_count: int = 0,
+    details: dict | None = None,
 ) -> AuditEvent:
 
     event = AuditEvent(
@@ -26,7 +30,8 @@ def write_audit(
         resource=resource,
         result=result,
         policy_id=policy_id,
-        object_count=object_count
+        object_count=object_count,
+        details=details,
     )
 
     db.add(event)

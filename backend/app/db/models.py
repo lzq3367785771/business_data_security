@@ -139,6 +139,12 @@ class AuditEvent(Base):
         Integer, default=0, nullable=False
     )
 
+    details: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=utc_now,

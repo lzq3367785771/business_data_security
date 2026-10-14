@@ -31,8 +31,12 @@ from app.modules.assets.router import (
 from app.modules.sensitive_detection.router import (
     router as sensitive_detection_router,
 )
-
-
+from app.modules.data_access.router import (
+    router as data_access_router,
+)
+from app.modules.access_monitoring.router import (
+    router as access_monitoring_router,
+)
 
 
 app = FastAPI(
@@ -120,6 +124,11 @@ app.include_router(data_sources_router)
 app.include_router(credentials_router)
 app.include_router(assets_router)
 app.include_router(sensitive_detection_router)
+app.include_router(data_access_router)
+app.include_router(access_monitoring_router)
+
+
+
 
 @app.get("/api/v1/health", tags=["System"])
 def health(request: Request):

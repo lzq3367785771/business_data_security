@@ -51,30 +51,66 @@ def list_audit_events(
     )
 
     statement = (
-        select(AuditEvent)
+        select(
+            AuditEvent,
+            User.username,
+        )
+        .join(
+            User,
+            User.id == AuditEvent.user_id,
+        )
         .order_by(
             AuditEvent.created_at.desc(),
-            AuditEvent.event_id.desc()
+            AuditEvent.event_id.desc(),
         )
         .limit(100)
     )
 
-    events = db.scalars(statement).all()
+    rows = db.execute(
+        statement
+    ).all()
+
 
     items = [
         {
-            "event_id": event.event_id,
-            "request_id": event.request_id,
-            "trace_id": event.trace_id,
-            "user_id": event.user_id,
-            "action": event.action,
-            "resource": event.resource,
-            "result": event.result,
-            "policy_id": event.policy_id,
-            "object_count": event.object_count,
-            "created_at": event.created_at.isoformat()
+            "event_id":
+                event.event_id,
+
+            "request_id":
+                event.request_id,
+
+            "trace_id":
+                event.trace_id,
+
+            "user_id":
+                event.user_id,
+
+            "username":
+                username,
+
+            "action":
+                event.action,
+
+            "resource":
+                event.resource,
+
+            "result":
+                event.result,
+
+            "policy_id":
+                event.policy_id,
+
+            "object_count":
+                event.object_count,
+
+            "details":
+                event.details,
+
+            "created_at":
+                event.created_at.isoformat(),
         }
-        for event in events
+
+        for event, username in rows
     ]
 
     return success(

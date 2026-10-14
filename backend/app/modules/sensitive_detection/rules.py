@@ -123,6 +123,18 @@ FIELD_NAME_RULES: dict[str, SensitiveRule] = {
         sensitivity_level="L3",
         confidence=0.95,
     ),
+
+    # -------------------------
+    # 薪资信息
+    # -------------------------
+    "salary": SensitiveRule(
+        sensitive_type="salary",
+        sensitive_label="薪资信息",
+        sensitivity_level="L3",
+        confidence=0.95,
+    ),
+
+
 }
 
 

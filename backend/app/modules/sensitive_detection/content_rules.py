@@ -59,6 +59,29 @@ ADDRESS_KEYWORDS = (
 )
 
 
+# 组织 / 部门类名称后缀
+# 防止“研发部”“财务部”“人事中心”等
+# 被误识别为中文姓名
+ORGANIZATION_SUFFIXES = (
+    "部",
+    "部门",
+    "中心",
+    "科",
+    "组",
+    "处",
+    "室",
+    "办",
+    "院",
+    "所",
+    "公司",
+    "分公司",
+    "事业部",
+    "团队",
+)
+
+
+
+
 def normalize_value(value) -> str:
     if value is None:
         return ""
@@ -94,10 +117,11 @@ def looks_like_chinese_name(
     """
     中文姓名启发式判断。
 
-    第一版：
+    当前规则：
     - 2~6 个中文字符
     - 可以含 ·
-    - 排除明显行政区名称
+    - 排除行政区名称
+    - 排除组织 / 部门名称
     """
 
     text = normalize_value(value)
@@ -107,8 +131,15 @@ def looks_like_chinese_name(
     ):
         return False
 
+    # 排除北京市、四川省等
     if text.endswith(
         ADMIN_REGION_SUFFIXES
+    ):
+        return False
+
+    # 排除研发部、财务部、人事中心等
+    if text.endswith(
+        ORGANIZATION_SUFFIXES
     ):
         return False
 

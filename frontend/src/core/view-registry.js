@@ -1,6 +1,6 @@
 import {
-    loadCustomers
-} from "../modules/customers/customers.js";
+    loadDataAccess
+} from "../modules/data-access/data-access.js";
 
 import {
     loadSystems
@@ -34,9 +34,9 @@ export const viewRegistry = {
         title: "业务数据访问",
 
         description:
-            "验证访问权限与动态脱敏策略",
+            "访问受控业务数据并执行动态安全策略",
 
-        load: loadCustomers
+        load: loadDataAccess
     },
 
 
