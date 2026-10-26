@@ -38,7 +38,9 @@ from app.modules.access_monitoring.service import (
 from app.modules.access_monitoring.schemas import (
     AnomalyStatusUpdate,
 )
-
+from app.modules.access_monitoring.state_machine import (
+    validate_transition,
+)
 
 
 
@@ -581,10 +583,63 @@ def update_anomaly_event_status(
 
     old_status = event.status
 
+
+    # =========================
+    # 状态机校验
+    # =========================
+
+    try:
+
+        validate_transition(
+            current_status=old_status,
+            target_status=payload.status,
+        )
+
+    except ValueError as exc:
+
+        write_audit(
+            db=db,
+            request=request,
+            user=user,
+            action=(
+                "UPDATE_ANOMALY_STATUS"
+            ),
+            resource=(
+                "access_monitoring:"
+                "events:status"
+            ),
+            result="DENY",
+            policy_id=(
+                decision.policy_id
+            ),
+            object_count=0,
+            details={
+                "anomaly_id":
+                    event.anomaly_id,
+
+                "anomaly_type":
+                    event.anomaly_type,
+
+                "old_status":
+                    old_status,
+
+                "requested_status":
+                    payload.status,
+
+                "reason":
+                    "INVALID_STATUS_TRANSITION",
+            },
+        )
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+
     event.status = (
         payload.status
     )
-
 
     db.commit()
 

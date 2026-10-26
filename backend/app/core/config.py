@@ -3,13 +3,32 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from pathlib import Path
+
+# =========================
+# Backend 路径
+# =========================
+
+BACKEND_DIR = (
+    Path(__file__)
+    .resolve()
+    .parents[2]
+)
+
+ENV_FILE = (
+    BACKEND_DIR
+    / ".env"
+)
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env",
-        extra="ignore"
+        env_file=str(
+            ENV_FILE
+        ),
+        env_file_encoding="utf-8",
+        extra="ignore",
     )
-
     app_env: str = "development"
 
     database_url: str
