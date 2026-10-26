@@ -1,0 +1,189 @@
+.access-monitoring-page {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+
+.access-monitoring-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+
+.access-monitoring-stat-card {
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf1;
+    border-radius: 10px;
+}
+
+
+.access-monitoring-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    color: #0f172a;
+}
+
+
+.access-monitoring-stat-label {
+    margin-top: 8px;
+
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+.access-monitoring-table {
+    padding: 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf1;
+    border-radius: 10px;
+
+    overflow-x: auto;
+}
+
+
+@media (max-width: 1000px) {
+
+    .access-monitoring-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+
+
+.access-monitoring-toolbar {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 14px 16px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf1;
+    border-radius: 10px;
+}
+
+
+.access-monitoring-filter-select {
+    min-width: 180px;
+
+    height: 38px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d7dee8;
+    border-radius: 6px;
+
+    background: #ffffff;
+}
+
+
+.access-monitoring-reset-button {
+    height: 38px;
+
+    padding: 0 16px;
+
+    margin-left: auto;
+
+    background: #ffffff;
+
+    border: 1px solid #d7dee8;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+.access-monitoring-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.access-monitoring-data-table {
+    width: 100%;
+    min-width: 1350px;
+
+    border-collapse: collapse;
+}
+
+
+.access-monitoring-data-table th,
+.access-monitoring-data-table td {
+    padding: 12px 14px;
+
+    border-bottom: 1px solid #e5eaf1;
+
+    text-align: left;
+    white-space: nowrap;
+
+    font-size: 14px;
+}
+
+
+.access-monitoring-data-table th {
+    background: #f8fafc;
+
+    color: #334155;
+
+    font-weight: 600;
+}
+
+
+.access-monitoring-actions {
+    display: flex;
+
+    gap: 8px;
+
+    align-items: center;
+}
+
+
+.anomaly-action-button {
+    padding: 6px 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #d7dee8;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+
+.anomaly-action-button:hover {
+    background: #f8fafc;
+}
+
+
+.anomaly-confirm-button {
+    color: #2563eb;
+}
+
+
+.anomaly-ignore-button {
+    color: #64748b;
+}
+
+
+.anomaly-resolve-button {
+    color: #15803d;
+}

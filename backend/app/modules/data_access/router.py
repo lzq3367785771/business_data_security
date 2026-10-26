@@ -54,7 +54,13 @@ from app.modules.systems.service import (
     get_system_by_id,
 )
 
-
+from app.modules.risk_control.service import (
+    ACTION_ALLOW,
+    ACTION_BLOCK,
+    ACTION_LIMIT,
+    ACTION_MASK,
+    decide_data_access_control,
+)
 
 
 
@@ -219,8 +225,179 @@ def preview_business_table(
             detail="未配置数据库用户名",
         )
 
+
+
+
     # =========================
-    # 5. 临时解密密码
+    # 5. 风险处置决策
+    # =========================
+
+    risk_decision = (
+        decide_data_access_control(
+            db=db,
+            user=user,
+            source_id=source.id,
+            database_name=(
+                database.database_name
+            ),
+            table_name=(
+                table.table_name
+            ),
+        )
+    )
+
+
+    risk_action = (
+        risk_decision["action"]
+    )
+
+    risk_control_applied = (
+        risk_decision[
+            "risk_control_applied"
+        ]
+    )
+
+    risk_control_reason = (
+        risk_decision["reason"]
+    )
+
+    active_anomaly_id = (
+        risk_decision[
+            "active_anomaly_id"
+        ]
+    )
+
+    max_rows = (
+        risk_decision.get(
+            "max_rows"
+        )
+    )
+
+    mask_required = (
+        risk_decision.get(
+            "mask_required",
+            False,
+        )
+    )
+
+
+    # =========================
+    # 6. 计算实际读取行数
+    # =========================
+
+    effective_limit = limit
+
+
+    if (
+        risk_action
+        == ACTION_LIMIT
+        and max_rows is not None
+    ):
+
+        effective_limit = min(
+            limit,
+            max_rows,
+        )
+
+
+
+    # =========================
+    # 7. BLOCK：完全阻断
+    # =========================
+
+    if (
+        risk_action
+        == ACTION_BLOCK
+    ):
+
+        write_audit(
+            db=db,
+            request=request,
+            user=user,
+            action="READ_BUSINESS_DATA",
+            resource="data_access:preview",
+            result="DENY",
+            policy_id=decision.policy_id,
+            object_count=0,
+
+            details={
+                "system_id":
+                    source.system_id,
+
+                "system_code":
+                    (
+                        system.system_code
+                        if system
+                        else None
+                    ),
+
+                "source_id":
+                    source.id,
+
+                "source_code":
+                    source.source_code,
+
+                "database_name":
+                    database.database_name,
+
+                "table_name":
+                    table.table_name,
+
+                "access_mode":
+                    "blocked",
+
+                "risk_action":
+                    risk_action,
+
+                "risk_control_applied":
+                    True,
+
+                "risk_control_reason":
+                    risk_control_reason,
+
+                "active_anomaly_id":
+                    active_anomaly_id,
+
+                "requested_limit":
+                    limit,
+
+                "effective_limit":
+                    0,
+
+                "limit_applied":
+                    True,
+
+                "masked_fields":
+                    [],
+
+                "returned_rows":
+                    0,
+            },
+        )
+
+
+        raise HTTPException(
+            status_code=403,
+            detail={
+                "message":
+                    "检测到已确认的高风险异常，"
+                    "本次业务数据访问已被阻断",
+
+                "risk_action":
+                    ACTION_BLOCK,
+
+                "risk_control_reason":
+                    risk_control_reason,
+
+                "active_anomaly_id":
+                    active_anomaly_id,
+            },
+        )
+
+
+
+    # =========================
+    # 8. 临时解密数据库密码
     # =========================
 
     try:
@@ -229,11 +406,15 @@ def preview_business_table(
                 credential
             )
         )
+
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
             detail=str(exc),
         ) from exc
+
+
+
 
     # =========================
     # 6. 读取真实业务数据
@@ -255,7 +436,7 @@ def preview_business_table(
                 column.column_name
                 for column in columns
             ],
-            limit=limit,
+            limit=effective_limit,
         )
     except pymysql.MySQLError as exc:
         write_audit(
@@ -333,21 +514,80 @@ def preview_business_table(
     )
 
 
+
+    # =========================
+    # 9. 执行风险处置动作
+    # =========================
+
     access_mode = "raw"
     masked_fields = []
 
-    # 默认安全：除 admin 外均执行脱敏
-    if user.role != "admin":
+
+    if (
+        risk_action
+        == ACTION_MASK
+    ):
+
         items = mask_rows(
             rows=items,
             field_types=(
                 sensitive_field_types
             ),
         )
+
         access_mode = "masked"
+
         masked_fields = sorted(
             sensitive_field_types.keys()
         )
+
+
+    elif (
+        risk_action
+        == ACTION_LIMIT
+    ):
+
+        if mask_required:
+
+            items = mask_rows(
+                rows=items,
+                field_types=(
+                    sensitive_field_types
+                ),
+            )
+
+            access_mode = (
+                "limited_masked"
+            )
+
+            masked_fields = sorted(
+                sensitive_field_types.keys()
+            )
+
+        else:
+
+            access_mode = "limited"
+
+
+    elif (
+        risk_action
+        == ACTION_ALLOW
+    ):
+
+        access_mode = "raw"
+
+
+    else:
+
+        raise HTTPException(
+            status_code=500,
+            detail=(
+                "当前风险处置动作"
+                f" {risk_action} "
+                "尚未实现"
+            ),
+        )
+
 
     # =========================
     # 8. 审计
@@ -397,13 +637,32 @@ def preview_business_table(
             "sensitive_field_levels":
                 sensitive_field_levels,
 
+            "risk_control_applied":
+                risk_control_applied,
 
+            "risk_control_reason":
+                risk_control_reason,
+
+            "risk_action":
+                risk_action,    
+
+            "active_anomaly_id":
+                active_anomaly_id,
 
             "masked_fields":
                 masked_fields,
 
             "requested_limit":
                 limit,
+
+            "effective_limit":
+                effective_limit,
+
+            "limit_applied":
+                (
+                    effective_limit
+                    < limit
+                ),
 
             "returned_rows":
                 len(items),
@@ -424,6 +683,33 @@ def preview_business_table(
             "table_name": table.table_name,
             "access_mode": access_mode,
             "masked_fields": masked_fields,
+
+            "risk_action":
+                risk_action,
+
+            "risk_control_applied":
+                risk_control_applied,
+
+            "risk_control_reason":
+                risk_control_reason,
+
+            "active_anomaly_id":
+                active_anomaly_id,
+                        
+
+            "requested_limit":
+                limit,
+
+            "effective_limit":
+                effective_limit,
+
+            "limit_applied":
+                (
+                    effective_limit
+                    < limit
+                ),
+
+
             "columns": [
                 {
                     "column_asset_id": column.id,

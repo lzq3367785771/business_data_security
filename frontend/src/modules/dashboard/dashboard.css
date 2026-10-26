@@ -1,0 +1,341 @@
+.dashboard-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+
+.dashboard-section {
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf1;
+    border-radius: 12px;
+}
+
+
+.dashboard-section-title {
+    margin: 0 0 18px;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #0f172a;
+}
+
+
+.dashboard-card-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(200px, 1fr)
+        );
+
+    gap: 16px;
+}
+
+
+.dashboard-stat-card {
+    min-height: 125px;
+
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+
+.dashboard-stat-value {
+    margin-bottom: 8px;
+
+    font-size: 30px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.dashboard-stat-label {
+    margin-bottom: 6px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #334155;
+}
+
+
+.dashboard-stat-description {
+    font-size: 13px;
+    line-height: 1.5;
+
+    color: #64748b;
+}
+
+
+
+.dashboard-security-status {
+    padding: 20px 24px;
+
+    border-radius: 12px;
+    border: 1px solid;
+
+    background: #ffffff;
+}
+
+
+.dashboard-security-safe {
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+
+.dashboard-security-attention {
+    border-color: #fcd34d;
+    background: #fffbeb;
+}
+
+
+.dashboard-security-high {
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+
+
+.dashboard-security-title {
+    margin-bottom: 8px;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.dashboard-security-message {
+    font-size: 14px;
+    line-height: 1.6;
+
+    color: #475569;
+}
+
+
+.dashboard-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+
+.dashboard-anomaly-table {
+    width: 100%;
+    min-width: 1100px;
+
+    border-collapse: collapse;
+}
+
+
+.dashboard-anomaly-table th,
+.dashboard-anomaly-table td {
+    padding: 12px 14px;
+
+    border-bottom:
+        1px solid #e5eaf1;
+
+    text-align: left;
+    white-space: nowrap;
+
+    font-size: 14px;
+}
+
+
+.dashboard-anomaly-table th {
+    background: #f8fafc;
+
+    color: #334155;
+
+    font-weight: 600;
+}
+
+
+.dashboard-empty {
+    padding: 24px;
+
+    text-align: center;
+
+    color: #64748b;
+}
+
+.dashboard-access-table {
+    width: 100%;
+    min-width: 1250px;
+
+    border-collapse: collapse;
+}
+
+
+.dashboard-access-table th,
+.dashboard-access-table td {
+    padding: 12px 14px;
+
+    border-bottom:
+        1px solid #e5eaf1;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+    font-size: 14px;
+}
+
+
+.dashboard-access-table th {
+    background: #f8fafc;
+
+    color: #334155;
+
+    font-weight: 600;
+}
+
+.dashboard-access-risk-row {
+    background: #fff7ed;
+}
+
+
+.dashboard-access-risk-row:hover {
+    background: #ffedd5;
+}
+
+
+.dashboard-trend-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 18px;
+}
+
+
+.dashboard-trend-panel {
+    padding: 18px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+
+
+.dashboard-trend-title {
+    margin-bottom: 20px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #334155;
+}
+
+
+.dashboard-trend-bars {
+    display: flex;
+
+    align-items: flex-end;
+
+    height: 190px;
+
+    gap: 10px;
+}
+
+
+.dashboard-trend-bar-item {
+    flex: 1;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+
+    min-width: 0;
+}
+
+
+.dashboard-trend-value {
+    height: 24px;
+
+    font-size: 12px;
+
+    color: #475569;
+}
+
+
+.dashboard-trend-track {
+    flex: 1;
+
+    width: 28px;
+
+    display: flex;
+    align-items: flex-end;
+
+    background: #e2e8f0;
+
+    border-radius: 5px 5px 0 0;
+
+    overflow: hidden;
+}
+
+
+.dashboard-trend-bar {
+    width: 100%;
+
+    border-radius: 5px 5px 0 0;
+
+    transition:
+        height 0.25s ease;
+}
+
+
+.dashboard-trend-business {
+    background: #3b82f6;
+}
+
+
+.dashboard-trend-risk {
+    background: #f59e0b;
+}
+
+
+.dashboard-trend-anomaly {
+    background: #ef4444;
+}
+
+
+.dashboard-trend-date {
+    margin-top: 8px;
+
+    font-size: 11px;
+
+    color: #64748b;
+
+    white-space: nowrap;
+}
+
+
+@media (
+    max-width: 1100px
+) {
+
+    .dashboard-trend-grid {
+        grid-template-columns:
+            1fr;
+    }
+}

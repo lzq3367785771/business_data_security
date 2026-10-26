@@ -37,7 +37,9 @@ from app.modules.data_access.router import (
 from app.modules.access_monitoring.router import (
     router as access_monitoring_router,
 )
-
+from app.modules.dashboard.router import (
+    router as dashboard_router,
+)
 
 app = FastAPI(
     title="Business Data AI Security Platform",
@@ -84,16 +86,65 @@ async def http_exception_handler(
     request: Request,
     exc: HTTPException
 ):
+
+    detail = exc.detail
+
+
+    # =========================
+    # 结构化业务异常
+    # =========================
+
+    if isinstance(
+        detail,
+        dict,
+    ):
+
+        message = (
+            detail.get("message")
+            or "请求失败"
+        )
+
+        data = {
+            key: value
+            for key, value
+            in detail.items()
+            if key != "message"
+        }
+
+        if not data:
+            data = None
+
+
+    # =========================
+    # 普通字符串异常
+    # =========================
+
+    else:
+
+        message = str(detail)
+
+        data = None
+
+
     return JSONResponse(
         status_code=exc.status_code,
         content={
-            "code": exc.status_code,
-            "message": str(exc.detail),
-            "data": None,
-            "request_id": getattr(
-                request.state, "request_id", None
-            )
-        }
+            "code":
+                exc.status_code,
+
+            "message":
+                message,
+
+            "data":
+                data,
+
+            "request_id":
+                getattr(
+                    request.state,
+                    "request_id",
+                    None,
+                ),
+        },
     )
 
 
@@ -126,7 +177,7 @@ app.include_router(assets_router)
 app.include_router(sensitive_detection_router)
 app.include_router(data_access_router)
 app.include_router(access_monitoring_router)
-
+app.include_router(dashboard_router)
 
 
 

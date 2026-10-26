@@ -65,7 +65,7 @@ const statusMessage =
 // =========================
 
 let activeView =
-    "customers";
+    "dashboard";
 
 let currentRole =
     null;
@@ -278,7 +278,7 @@ loginForm.addEventListener(
 
             // 默认页面
             await loadView(
-                "customers"
+                "dashboard"
             );
 
         } catch (error) {
@@ -375,14 +375,14 @@ document
 
                     button.classList.toggle(
                         "active",
-                        button.dataset.view
-                            === "customers"
+                        button.dataset.view ===
+                            "dashboard"
                     );
                 });
 
 
             activeView =
-                "customers";
+                "dashboard";
 
 
             // 返回登录页面

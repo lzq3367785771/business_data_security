@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-
+from uuid import uuid4
 from sqlalchemy import (
     Boolean,
     DateTime,
@@ -153,7 +153,114 @@ class AuditEvent(Base):
     )
 
 
+class AnomalyEvent(Base):
+    __tablename__ = "anomaly_events"
 
+    anomaly_id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    )
+
+    anomaly_type: Mapped[str] = mapped_column(
+        String(100),
+        nullable=False,
+        index=True,
+    )
+
+    risk_level: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        index=True,
+    )
+
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
+
+    system_code: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    source_id: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    source_code: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    database_name: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    table_name: Mapped[str | None] = mapped_column(
+        String(255),
+        nullable=True,
+    )
+
+    access_count: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=0,
+    )
+
+    window_minutes: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=5,
+    )
+
+    sensitive_fields: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    sensitivity_levels: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    evidence_event_ids: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    first_access_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
+    last_access_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True,
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="open",
+        index=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+    )
 
 class BusinessSystem(Base):
     __tablename__ = "business_systems"

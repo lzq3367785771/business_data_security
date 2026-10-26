@@ -240,6 +240,32 @@ function createPage(
 }
 
 
+function clearPreviewState(
+    refs
+) {
+
+    // 清空上一次查询返回的数据表格
+    refs.tableContainer
+        .replaceChildren();
+
+
+    // 隐藏上一次访问模式提示
+    refs.securityInfo.hidden =
+        true;
+
+
+    // 清空提示文字
+    refs.securityInfo.textContent =
+        "";
+
+
+    // 恢复默认 class
+    refs.securityInfo.className =
+        "data-access-security-info";
+}
+
+
+
 function renderSystemOptions(
     select,
     systems
@@ -361,7 +387,9 @@ async function loadTablesForSource(
     } = context;
 
 
-    refs.tableContainer.replaceChildren();
+    clearPreviewState(
+        refs
+    );
 
 
     if (!state.selectedSourceId) {
@@ -443,6 +471,11 @@ async function loadSourcesForSystem(
     } = context;
 
 
+    clearPreviewState(
+        refs
+    );
+
+
     state.selectedSystemId =
         Number(systemId);
 
@@ -476,7 +509,6 @@ async function loadSourcesForSystem(
 
         refs.tableSelect.replaceChildren();
 
-        refs.tableContainer.replaceChildren();
 
         refs.sourceInfo.textContent =
             "当前业务系统暂无数据源";
@@ -529,6 +561,13 @@ async function handlePreview(
     }
 
 
+    // 每次重新查询前，
+    // 清理上一次查询留下的结果
+    clearPreviewState(
+        refs
+    );
+
+
     refs.queryButton.disabled =
         true;
 
@@ -538,6 +577,9 @@ async function handlePreview(
 
     statusMessage.textContent =
         "正在读取真实业务数据...";
+
+
+
 
 
     try {
@@ -568,28 +610,62 @@ async function handlePreview(
             false;
 
 
-        if (data.access_mode === "masked") {
+        if (
+            data.risk_control_applied &&
+            data.risk_control_reason ===
+                "ACTIVE_HIGH_RISK_ANOMALY"
+        ) {
 
-            const fields =
-                data.masked_fields || [];
+            const requestedLimit =
+                Number(
+                    data.requested_limit ??
+                    refs.limitSelect.value
+                );
+
+            const effectiveLimit =
+                Number(
+                    data.effective_limit ??
+                    data.total_returned ??
+                    requestedLimit
+                );
+
 
             refs.securityInfo.className =
                 "data-access-security-info " +
-                "data-access-security-masked";
+                "data-access-security-banner-risk";
+
+
+            refs.securityInfo.textContent =
+                "⚠ 高风险访问限制已生效 · " +
+                "处置措施：限流 + 动态脱敏 · " +
+                `请求行数：${requestedLimit} · ` +
+                `允许行数：${effectiveLimit}` +
+                (
+                    data.active_anomaly_id
+                        ? ` · 关联异常：${data.active_anomaly_id}`
+                        : ""
+                );
+
+        } else if (
+            data.access_mode === "masked"
+        ) {
+
+            refs.securityInfo.className =
+                "data-access-security-info " +
+                "data-access-security-info-masked";
 
             refs.securityInfo.textContent =
                 "当前访问模式：脱敏访问 · " +
-                (
-                    fields.length > 0
-                        ? `已脱敏字段：${fields.join("、")}`
-                        : "未发现需要脱敏的字段"
-                );
+                "当前角色按访问策略执行脱敏 · " +
+                `已脱敏字段：${
+                    (data.masked_fields || []).join("、")
+                }`;
 
         } else {
 
             refs.securityInfo.className =
                 "data-access-security-info " +
-                "data-access-security-raw";
+                "data-access-security-info-raw";
 
             refs.securityInfo.textContent =
                 "当前访问模式：原始数据访问 · " +
@@ -610,13 +686,72 @@ async function handlePreview(
             `${data.database_name}.${data.table_name}`;
 
 
-        statusMessage.textContent =
-            `真实业务数据读取成功：` +
-            `返回 ${data.total_returned} 行`;
+        if (
+            data.risk_action === "LIMIT"
+        ) {
+
+            statusMessage.textContent =
+                `高风险访问限制已执行：` +
+                `请求 ${data.requested_limit} 行，` +
+                `实际返回 ${data.total_returned} 行`;
+
+        } else {
+
+            statusMessage.textContent =
+                `真实业务数据读取成功：` +
+                `返回 ${data.total_returned} 行`;
+        }
 
     } catch (error) {
 
-        refs.tableContainer.replaceChildren();
+        clearPreviewState(
+            refs
+        );
+
+
+        const errorData =
+            error.data;
+
+
+        // =========================
+        // BLOCK：高风险访问阻断
+        // =========================
+
+        if (
+            error.status === 403 &&
+            errorData &&
+            errorData.risk_action === "BLOCK"
+        ) {
+
+            refs.securityInfo.hidden =
+                false;
+
+            refs.securityInfo.className =
+                "data-access-security-info " +
+                "data-access-security-banner-risk";
+
+
+            refs.securityInfo.textContent =
+                "⛔ 高风险访问已阻断 · " +
+                "检测到已确认的高风险异常，" +
+                "系统已拒绝本次业务数据访问" +
+                (
+                    errorData.active_anomaly_id
+                        ? ` · 关联异常：${errorData.active_anomaly_id}`
+                        : ""
+                );
+
+
+            statusMessage.textContent =
+                "业务数据访问已阻断：本次未返回任何业务数据";
+
+            return;
+        }
+
+
+        // =========================
+        // 普通请求错误
+        // =========================
 
         statusMessage.textContent =
             `业务数据读取失败：${error.message}`;
@@ -727,7 +862,9 @@ export async function loadDataAccess(
             state.selectedTableName =
                 refs.tableSelect.value;
 
-            refs.tableContainer.replaceChildren();
+            clearPreviewState(
+                refs
+            );
 
             refs.sourceInfo.textContent =
                 `当前选择：${state.selectedTableName}`;
@@ -755,3 +892,4 @@ export async function loadDataAccess(
         firstSystem.id
     );
 }
+

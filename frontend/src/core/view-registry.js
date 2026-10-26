@@ -26,9 +26,31 @@ import {
     loadDataSources
 } from "../modules/data-sources/data-sources.js";
 
+import {
+    loadAccessMonitoring
+} from "../modules/access-monitoring/access-monitoring.js";
+
+import {
+    loadDashboard
+} from "../modules/dashboard/dashboard.js";
+
+
+
+
+
+
 
 
 export const viewRegistry = {
+
+    dashboard: {
+        title: "安全态势",
+
+        description:
+            "查看数据资产、敏感数据及异常风险总体态势",
+
+        load: loadDashboard
+    },
 
     customers: {
         title: "业务数据访问",
@@ -87,6 +109,16 @@ export const viewRegistry = {
             "查看当前访问控制与脱敏策略",
 
         load: loadPolicies
+    },
+
+
+    accessMonitoring: {
+        title: "异常访问监测",
+
+        description:
+            "监测敏感数据异常访问行为及异常事件处置状态",
+
+        load: loadAccessMonitoring
     },
 
 

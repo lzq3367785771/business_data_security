@@ -154,6 +154,7 @@ function createAuditPage(
     appendOptions(
         riskSelect,
         [
+            "blocked",
             "high",
             "medium",
             "controlled",
@@ -163,13 +164,13 @@ function createAuditPage(
         value => {
 
             const labels = {
+                blocked: "已阻断",
                 high: "高风险",
                 medium: "中风险",
                 controlled: "受控访问",
                 normal: "普通访问",
                 pending: "待评估"
             };
-
             return labels[value];
         }
     );
@@ -181,12 +182,36 @@ function createAuditPage(
         accessModeSelect,
         [
             "raw",
-            "masked"
+            "masked",
+            "limited_masked",
+            "limited",
+            "blocked"
         ],
-        value =>
-            value === "raw"
-                ? "原始访问"
-                : "脱敏访问"
+        value => {
+
+            const labels = {
+                raw:
+                    "原始访问",
+
+                masked:
+                    "脱敏访问",
+
+                limited_masked:
+                    "限流 + 脱敏",
+
+                limited:
+                    "限流访问",
+
+                blocked:
+                    "已阻断"
+            };
+
+
+            return (
+                labels[value]
+                || value
+            );
+        }
     );
 
 
@@ -330,6 +355,31 @@ function getAuditRisk(
 
 
     if (
+        details.risk_action === "BLOCK" ||
+        details.access_mode === "blocked"
+    ) {
+
+        return {
+            code: "blocked",
+            text: "⛔ 已阻断"
+        };
+    }
+
+
+    if (
+        details.risk_action === "LIMIT" ||
+        details.access_mode === "limited_masked" ||
+        details.access_mode === "limited"
+    ) {
+
+        return {
+            code: "controlled",
+            text: "⚠ 限流受控"
+        };
+    }
+
+
+    if (
         details.access_mode === "masked" &&
         sensitiveFields.length > 0
     ) {
@@ -460,20 +510,42 @@ function buildAuditDisplayItems(
                 "-";
 
             if (
-                details.access_mode
-                === "raw"
+                details.access_mode === "raw"
             ) {
 
                 accessModeText =
                     "原始访问";
 
             } else if (
-                details.access_mode
-                === "masked"
+                details.access_mode === "masked"
             ) {
 
                 accessModeText =
                     "脱敏访问";
+
+            } else if (
+                details.access_mode ===
+                    "limited_masked"
+            ) {
+
+                accessModeText =
+                    "限流 + 脱敏";
+
+            } else if (
+                details.access_mode ===
+                    "limited"
+            ) {
+
+                accessModeText =
+                    "限流访问";
+
+            } else if (
+                details.access_mode ===
+                    "blocked"
+            ) {
+
+                accessModeText =
+                    "⛔ 已阻断";
             }
 
             const sensitiveFields =
@@ -484,13 +556,11 @@ function buildAuditDisplayItems(
                 details.masked_fields || [];
 
 
-            const sensitiveFieldLevels =
-                details.sensitive_field_levels || {};
 
-            const sensitivityLevels =
-                Object.values(
-                    sensitiveFieldLevels
-                );
+
+            const isBlocked =
+                details.risk_action === "BLOCK" ||
+                details.access_mode === "blocked";
 
             const risk =
                 getAuditRisk(item);
@@ -528,22 +598,30 @@ function buildAuditDisplayItems(
                     risk.text,
 
                 sensitive_fields_text:
-                    sensitiveFields.length > 0
-                        ? sensitiveFields.join("、")
+                    isBlocked
+                        ? "未读取"
                         : (
-                            details.access_mode
-                                ? "无"
-                                : "-"
+                            sensitiveFields.length > 0
+                                ? sensitiveFields.join("、")
+                                : (
+                                    details.access_mode
+                                        ? "无"
+                                        : "-"
+                                )
                         ),
 
                 masked_fields_text:
-                    maskedFields.length > 0
-                        ? maskedFields.join("、")
+                    isBlocked
+                        ? "不适用"
                         : (
-                            details.access_mode
-                                ? "无"
-                                : "-"
-                        )
+                            maskedFields.length > 0
+                                ? maskedFields.join("、")
+                                : (
+                                    details.access_mode
+                                        ? "无"
+                                        : "-"
+                                )
+                        ),
             };
         }
     );

@@ -122,21 +122,41 @@ export async function apiRequest(
      *   data: ...
      * }
      */
-    if (!response.ok || result.code !== 0) {
+    if (
+        !response.ok ||
+        result.code !== 0
+    ) {
 
-        /*
-         * JWT失效
-         */
-        if (response.status === 401) {
-
+        if (
+            response.status === 401
+        ) {
             accessToken = null;
         }
 
 
-        throw new Error(
-            result.message ||
-            `请求失败，HTTP ${response.status}`
-        );
+        const error =
+            new Error(
+                result.message ||
+                `请求失败，HTTP ${response.status}`
+            );
+
+
+        // 保存 HTTP 状态码
+        error.status =
+            response.status;
+
+
+        // 保存后端结构化业务异常数据
+        error.data =
+            result.data || null;
+
+
+        // 保存 request_id，便于后续审计排查
+        error.requestId =
+            result.request_id || null;
+
+
+        throw error;
     }
 
 

@@ -472,6 +472,64 @@ def main():
             update_existing=True,
         )
 
+        create_policy(
+            db=db,
+            name="异常访问检测执行策略",
+            resource="access_monitoring:detect",
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+
+        create_policy(
+            db=db,
+            name="异常事件列表查看策略",
+            resource="access_monitoring:events",
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+        create_policy(
+            db=db,
+            name="异常事件状态修改策略",
+            resource=(
+                "access_monitoring:"
+                "events:status"
+            ),
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+
+        # -------------------------
+        # 安全态势首页
+        # -------------------------
+
+        create_policy(
+            db=db,
+            name="安全态势概览查看策略",
+            resource="dashboard:summary",
+            roles=[
+                "admin",
+                "analyst",
+            ],
+            mask_fields=[],
+            priority=100,
+        )
+
+
         # -------------------------
         # 演示客户数据
         # -------------------------

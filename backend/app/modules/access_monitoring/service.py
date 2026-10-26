@@ -4,6 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.db.models import (
+    AnomalyEvent,
     AuditEvent,
     User,
 )
@@ -311,3 +312,366 @@ def detect_frequent_raw_sensitive_access(
 
 
     return anomalies
+
+
+def _parse_datetime(
+    value,
+) -> datetime | None:
+
+    if value is None:
+        return None
+
+    if isinstance(
+        value,
+        datetime,
+    ):
+        return value
+
+    return datetime.fromisoformat(
+        value
+    )
+
+
+def persist_anomalies(
+    db: Session,
+    anomalies: list[dict],
+) -> list[AnomalyEvent]:
+    """
+    将检测结果写入 anomaly_events。
+
+    去重规则：
+        同一异常类型
+        + 同一用户
+        + 同一数据源
+        + 同一数据库
+        + 同一数据表
+        + status = open
+
+    如果存在：
+        更新原异常事件。
+
+    如果不存在：
+        创建新的异常事件。
+    """
+
+    saved_events = []
+
+    for anomaly in anomalies:
+
+        statement = (
+            select(
+                AnomalyEvent
+            )
+            .where(
+                AnomalyEvent.anomaly_type
+                == anomaly[
+                    "anomaly_type"
+                ],
+
+                AnomalyEvent.user_id
+                == anomaly[
+                    "user_id"
+                ],
+
+                AnomalyEvent.source_id
+                == anomaly[
+                    "source_id"
+                ],
+
+                AnomalyEvent.database_name
+                == anomaly[
+                    "database_name"
+                ],
+
+                AnomalyEvent.table_name
+                == anomaly[
+                    "table_name"
+                ],
+
+                AnomalyEvent.status.in_(
+                    [
+                        "open",
+                        "confirmed",
+                    ]
+                ),
+            )
+            .order_by(
+                AnomalyEvent.created_at.desc()
+            )
+            .limit(1)
+        )
+
+
+        existing = (
+            db.execute(
+                statement
+            )
+            .scalar_one_or_none()
+        )
+
+
+        first_access_at = (
+            _parse_datetime(
+                anomaly[
+                    "first_access_at"
+                ]
+            )
+        )
+
+        last_access_at = (
+            _parse_datetime(
+                anomaly[
+                    "last_access_at"
+                ]
+            )
+        )
+
+
+        new_evidence_ids = (
+            anomaly.get(
+                "evidence_event_ids"
+            )
+            or []
+        )
+
+
+        if existing:
+
+            old_evidence_ids = (
+                existing.evidence_event_ids
+                or []
+            )
+
+            merged_evidence_ids = list(
+                dict.fromkeys(
+                    [
+                        *old_evidence_ids,
+                        *new_evidence_ids,
+                    ]
+                )
+            )
+
+
+            existing.risk_level = (
+                anomaly[
+                    "risk_level"
+                ]
+            )
+
+            existing.system_code = (
+                anomaly.get(
+                    "system_code"
+                )
+            )
+
+            existing.source_code = (
+                anomaly.get(
+                    "source_code"
+                )
+            )
+
+
+            old_sensitive_fields = (
+                existing.sensitive_fields
+                or []
+            )
+
+            existing.sensitive_fields = (
+                sorted(
+                    set(
+                        old_sensitive_fields
+                    )
+                    | set(
+                        anomaly.get(
+                            "sensitive_fields"
+                        )
+                        or []
+                    )
+                )
+            )
+
+
+            old_levels = (
+                existing.sensitivity_levels
+                or []
+            )
+
+            existing.sensitivity_levels = (
+                sorted(
+                    set(
+                        old_levels
+                    )
+                    | set(
+                        anomaly.get(
+                            "sensitivity_levels"
+                        )
+                        or []
+                    )
+                )
+            )
+
+
+            existing.evidence_event_ids = (
+                merged_evidence_ids
+            )
+
+            # 此处表示当前异常事件累计关联
+            # 了多少条不同审计证据
+            existing.access_count = len(
+                merged_evidence_ids
+            )
+
+            existing.window_minutes = (
+                anomaly[
+                    "window_minutes"
+                ]
+            )
+
+
+            if (
+                existing.first_access_at
+                is None
+                or (
+                    first_access_at
+                    is not None
+                    and first_access_at
+                    < existing.first_access_at
+                )
+            ):
+                existing.first_access_at = (
+                    first_access_at
+                )
+
+
+            if (
+                existing.last_access_at
+                is None
+                or (
+                    last_access_at
+                    is not None
+                    and last_access_at
+                    > existing.last_access_at
+                )
+            ):
+                existing.last_access_at = (
+                    last_access_at
+                )
+
+
+            existing.updated_at = (
+                datetime.utcnow()
+            )
+
+            saved_events.append(
+                existing
+            )
+
+        else:
+
+            event = AnomalyEvent(
+                anomaly_type=(
+                    anomaly[
+                        "anomaly_type"
+                    ]
+                ),
+
+                risk_level=(
+                    anomaly[
+                        "risk_level"
+                    ]
+                ),
+
+                user_id=(
+                    anomaly[
+                        "user_id"
+                    ]
+                ),
+
+                system_code=(
+                    anomaly.get(
+                        "system_code"
+                    )
+                ),
+
+                source_id=(
+                    anomaly.get(
+                        "source_id"
+                    )
+                ),
+
+                source_code=(
+                    anomaly.get(
+                        "source_code"
+                    )
+                ),
+
+                database_name=(
+                    anomaly.get(
+                        "database_name"
+                    )
+                ),
+
+                table_name=(
+                    anomaly.get(
+                        "table_name"
+                    )
+                ),
+
+                access_count=len(
+                    new_evidence_ids
+                ),
+
+                window_minutes=(
+                    anomaly[
+                        "window_minutes"
+                    ]
+                ),
+
+                sensitive_fields=(
+                    anomaly.get(
+                        "sensitive_fields"
+                    )
+                    or []
+                ),
+
+                sensitivity_levels=(
+                    anomaly.get(
+                        "sensitivity_levels"
+                    )
+                    or []
+                ),
+
+                evidence_event_ids=(
+                    new_evidence_ids
+                ),
+
+                first_access_at=(
+                    first_access_at
+                ),
+
+                last_access_at=(
+                    last_access_at
+                ),
+
+                status="open",
+            )
+
+            db.add(
+                event
+            )
+
+            saved_events.append(
+                event
+            )
+
+
+    db.commit()
+
+
+    for event in saved_events:
+        db.refresh(
+            event
+        )
+
+
+    return saved_events
