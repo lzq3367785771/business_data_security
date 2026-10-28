@@ -31,7 +31,6 @@ from app.modules.audit.service import (
 )
 
 from app.modules.credentials.service import (
-    get_credential_by_key,
     resolve_credential_secret,
 )
 
@@ -40,15 +39,16 @@ from app.modules.data_sources.service import (
 )
 
 from app.modules.data_access.service import (
+    build_data_access_execution_plan,
     get_confirmed_sensitive_field_levels,
     get_confirmed_sensitive_field_types,
-    get_synced_table,
+    prepare_data_access_asset,
+    prepare_data_access_credential,
     read_mysql_table,
+    apply_data_access_action,
 )
 
-from app.modules.masking.service import (
-    mask_rows,
-)
+
 
 from app.modules.systems.service import (
     get_system_by_id,
@@ -128,26 +128,19 @@ def preview_business_table(
             detail="数据源不存在",
         )
 
-    if source.status != "active":
-        raise HTTPException(
-            status_code=400,
-            detail="数据源当前未启用",
-        )
+    # =========================
+    # 2. 数据源
+    # =========================
 
-    if source.source_type != "mysql":
-        raise HTTPException(
-            status_code=400,
-            detail="当前业务数据访问仅支持MySQL",
-        )
+    source = get_source_by_id(
+        db,
+        source_id,
+    )
 
-    if (
-        not source.host
-        or not source.port
-        or not source.database_name
-    ):
+    if source is None:
         raise HTTPException(
-            status_code=400,
-            detail="MySQL数据源连接参数不完整",
+            status_code=404,
+            detail="数据源不存在",
         )
 
 
@@ -157,73 +150,78 @@ def preview_business_table(
     )
 
 
-
     # =========================
-    # 3. 必须是已同步资产
+    # 3. 数据访问资产上下文
     # =========================
 
-    asset = get_synced_table(
-        db=db,
-        source_id=source.id,
-        table_name=table_name,
-    )
+    try:
 
-    if asset is None:
+        asset = prepare_data_access_asset(
+            db=db,
+            source=source,
+            table_name=table_name,
+        )
+
+    except LookupError as exc:
+
         raise HTTPException(
             status_code=404,
-            detail=(
-                "该数据表不存在，"
-                "或尚未同步到平台资产目录"
-            ),
-        )
+            detail=str(exc),
+        ) from exc
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
 
     database = asset["database"]
     table = asset["table"]
     columns = asset["columns"]
 
-    if not columns:
-        raise HTTPException(
-            status_code=400,
-            detail="该数据表没有可读取字段",
-        )
+
 
     # =========================
-    # 4. 获取访问凭据
+    # 4. 准备访问凭据
     # =========================
 
-    if not source.secret_ref:
-        raise HTTPException(
-            status_code=400,
-            detail="数据源尚未绑定访问凭据",
+    try:
+
+        credential_context = (
+            prepare_data_access_credential(
+                db=db,
+                source=source,
+            )
         )
 
-    credential = get_credential_by_key(
-        db,
-        source.secret_ref,
-    )
+    except LookupError as exc:
 
-    if credential is None:
         raise HTTPException(
             status_code=404,
-            detail="数据源绑定的凭据不存在",
-        )
+            detail=str(exc),
+        ) from exc
 
-    if credential.status != "active":
+    except ValueError as exc:
+
         raise HTTPException(
             status_code=400,
-            detail="数据源凭据当前未启用",
-        )
+            detail=str(exc),
+        ) from exc
 
-    username = (
-        credential.username
-        or source.username
+
+    credential = (
+        credential_context[
+            "credential"
+        ]
     )
 
-    if not username:
-        raise HTTPException(
-            status_code=400,
-            detail="未配置数据库用户名",
-        )
+    username = (
+        credential_context[
+            "username"
+        ]
+    )
 
 
 
@@ -247,57 +245,53 @@ def preview_business_table(
     )
 
 
+    # =========================
+    # 5. 风险执行计划
+    # =========================
+
+    execution_plan = (
+        build_data_access_execution_plan(
+            risk_decision=risk_decision,
+            requested_limit=limit,
+        )
+    )
+
+
     risk_action = (
-        risk_decision["action"]
+        execution_plan[
+            "risk_action"
+        ]
     )
 
     risk_control_applied = (
-        risk_decision[
+        execution_plan[
             "risk_control_applied"
         ]
     )
 
     risk_control_reason = (
-        risk_decision["reason"]
+        execution_plan[
+            "risk_control_reason"
+        ]
     )
 
     active_anomaly_id = (
-        risk_decision[
+        execution_plan[
             "active_anomaly_id"
         ]
     )
 
-    max_rows = (
-        risk_decision.get(
-            "max_rows"
-        )
-    )
-
     mask_required = (
-        risk_decision.get(
-            "mask_required",
-            False,
-        )
+        execution_plan[
+            "mask_required"
+        ]
     )
 
-
-    # =========================
-    # 6. 计算实际读取行数
-    # =========================
-
-    effective_limit = limit
-
-
-    if (
-        risk_action
-        == ACTION_LIMIT
-        and max_rows is not None
-    ):
-
-        effective_limit = min(
-            limit,
-            max_rows,
-        )
+    effective_limit = (
+        execution_plan[
+            "effective_limit"
+        ]
+    )
 
 
 
@@ -516,78 +510,45 @@ def preview_business_table(
 
 
     # =========================
-    # 9. 执行风险处置动作
+    # 执行读取后的风险动作
     # =========================
 
-    access_mode = "raw"
-    masked_fields = []
+    try:
 
-
-    if (
-        risk_action
-        == ACTION_MASK
-    ):
-
-        items = mask_rows(
-            rows=items,
-            field_types=(
-                sensitive_field_types
-            ),
-        )
-
-        access_mode = "masked"
-
-        masked_fields = sorted(
-            sensitive_field_types.keys()
-        )
-
-
-    elif (
-        risk_action
-        == ACTION_LIMIT
-    ):
-
-        if mask_required:
-
-            items = mask_rows(
-                rows=items,
-                field_types=(
+        action_result = (
+            apply_data_access_action(
+                items=items,
+                risk_action=risk_action,
+                mask_required=mask_required,
+                sensitive_field_types=(
                     sensitive_field_types
                 ),
             )
+        )
 
-            access_mode = (
-                "limited_masked"
-            )
-
-            masked_fields = sorted(
-                sensitive_field_types.keys()
-            )
-
-        else:
-
-            access_mode = "limited"
-
-
-    elif (
-        risk_action
-        == ACTION_ALLOW
-    ):
-
-        access_mode = "raw"
-
-
-    else:
+    except ValueError as exc:
 
         raise HTTPException(
             status_code=500,
-            detail=(
-                "当前风险处置动作"
-                f" {risk_action} "
-                "尚未实现"
-            ),
-        )
+            detail=str(exc),
+        ) from exc
 
+
+    items = (
+        action_result["items"]
+    )
+
+    access_mode = (
+        action_result[
+            "access_mode"
+        ]
+    )
+
+    masked_fields = (
+        action_result[
+            "masked_fields"
+        ]
+    )
 
     # =========================
     # 8. 审计

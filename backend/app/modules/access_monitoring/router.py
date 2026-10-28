@@ -271,6 +271,13 @@ def list_anomaly_events(
         default=None
     ),
 
+    min_risk_score: int | None = Query(
+        default=None,
+        ge=0,
+        le=100,
+    ),
+
+
     limit: int = Query(
         default=100,
         ge=1,
@@ -374,10 +381,25 @@ def list_anomaly_events(
             )
         )
 
+    # =========================
+    # 最低风险分数筛选
+    # =========================
+
+    if min_risk_score is not None:
+
+        statement = (
+            statement.where(
+                AnomalyEvent.risk_score
+                >= min_risk_score
+            )
+        )
+
+
 
     statement = (
         statement
         .order_by(
+            AnomalyEvent.risk_score.desc(),
             AnomalyEvent.last_access_at.desc(),
             AnomalyEvent.created_at.desc(),
         )
@@ -431,6 +453,13 @@ def list_anomaly_events(
 
                 "risk_level":
                     event.risk_level,
+
+                "risk_score":
+                    event.risk_score,
+
+                "risk_reasons":
+                    event.risk_reasons,
+
 
                 "status":
                     event.status,
@@ -515,6 +544,10 @@ def list_anomaly_events(
 
             "risk_level_filter":
                 risk_level,
+
+            "min_risk_score_filter":
+                min_risk_score,
+
 
             "limit":
                 limit,

@@ -95,6 +95,7 @@ export function renderAccessMonitoringTable(
     const headers = [
         "异常类型",
         "风险等级",
+        "风险原因",
         "用户",
         "业务系统",
         "数据源",
@@ -170,6 +171,30 @@ export function renderAccessMonitoringTable(
             )
         );
 
+        const riskReasonsCell =
+            document.createElement("td");
+
+        riskReasonsCell.className =
+            "access-monitoring-risk-reasons";
+
+
+        const riskReasonsContent =
+            document.createElement("div");
+
+        riskReasonsContent.className =
+            "access-monitoring-risk-reasons-content";
+
+        riskReasonsContent.textContent =
+            item.risk_reasons_text || "-";
+
+
+        riskReasonsCell.appendChild(
+            riskReasonsContent
+        );
+
+        tr.appendChild(
+            riskReasonsCell
+        );
         tr.appendChild(
             createCell(
                 item.username

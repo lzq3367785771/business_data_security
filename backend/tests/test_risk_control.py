@@ -316,3 +316,49 @@ def test_admin_with_confirmed_high_risk_should_block(
         decision["mask_required"]
         is False
     )
+
+
+def test_build_risk_decision_should_return_complete_structure():
+
+    decision = (
+        risk_service.build_risk_decision(
+            action=(
+                risk_service.ACTION_LIMIT
+            ),
+            reason=(
+                risk_service.REASON_ACTIVE_HIGH_RISK
+            ),
+            risk_control_applied=True,
+            active_anomaly_id="anomaly-001",
+            max_rows=5,
+            mask_required=True,
+        )
+    )
+
+    assert decision == {
+        "action":
+            "LIMIT",
+
+        "reason":
+            "ACTIVE_HIGH_RISK_ANOMALY",
+
+        "risk_control_applied":
+            True,
+
+        "active_anomaly_id":
+            "anomaly-001",
+
+        "max_rows":
+            5,
+
+        "mask_required":
+            True,
+    }
+
+
+def test_high_risk_limit_should_remain_five_rows():
+
+    assert (
+        risk_service.HIGH_RISK_MAX_ROWS
+        == 5
+    )

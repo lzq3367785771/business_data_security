@@ -211,23 +211,22 @@ function buildDisplayItems(
                 ...item,
 
                 risk_text:
-                    riskText,
+                    item.risk_score === null ||
+                    item.risk_score === undefined
+                        ? riskText
+                        : `${riskText}（${item.risk_score}分）`,
+
+                risk_reasons_text:
+                    (item.risk_reasons || []).join("、") || "-",
 
                 sensitivity_text:
-                    (
-                        item.sensitivity_levels
-                        || []
-                    ).join("、") || "-",
+                    (item.sensitivity_levels || []).join("、") || "-",
 
                 first_access_text:
-                    formatTime(
-                        item.first_access_at
-                    ),
+                    formatTime(item.first_access_at),
 
                 last_access_text:
-                    formatTime(
-                        item.last_access_at
-                    ),
+                    formatTime(item.last_access_at),
 
                 status_text:
                     statusLabels[

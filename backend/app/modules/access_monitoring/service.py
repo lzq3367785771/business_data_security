@@ -8,6 +8,7 @@ from app.db.models import (
     AuditEvent,
     User,
 )
+from app.modules.risk.scoring import evaluate_access_risk
 
 
 def detect_frequent_raw_sensitive_access(
@@ -171,6 +172,9 @@ def detect_frequent_raw_sensitive_access(
                 "sensitive_fields":
                     set(),
 
+                "sensitive_field_levels":
+                    {},
+
                 "sensitivity_levels":
                     set(),
             }
@@ -205,6 +209,13 @@ def detect_frequent_raw_sensitive_access(
             field_levels.values()
         )
 
+        group[
+            "sensitive_field_levels"
+        ].update(
+            field_levels
+        )
+
+
 
     anomalies = []
 
@@ -216,8 +227,31 @@ def detect_frequent_raw_sensitive_access(
         access_count = len(events)
 
 
+        requested_rows = max(
+            (
+                int(event.object_count or 0)
+                for event in events
+            ),
+            default=0,
+        )
+
+
+
+
         if access_count < threshold:
             continue
+
+
+        risk_result = evaluate_access_risk(
+            access_count=access_count,
+            requested_rows=requested_rows,
+            sensitive_field_levels=group[
+                "sensitive_field_levels"
+            ],
+            access_mode="raw",
+            user_role=None,
+        )
+
 
 
         anomalies.append(
@@ -232,7 +266,13 @@ def detect_frequent_raw_sensitive_access(
                     "高频原始敏感数据访问",
 
                 "risk_level":
-                    "HIGH",
+                    risk_result["risk_level"],
+
+                "risk_score":
+                    risk_result["risk_score"],
+
+                "risk_reasons":
+                    risk_result["reasons"],
 
                 "user_id":
                     group["user_id"],
@@ -458,6 +498,14 @@ def persist_anomalies(
                 ]
             )
 
+            existing.risk_score = (
+                anomaly.get("risk_score")
+            )
+
+            existing.risk_reasons = (
+                anomaly.get("risk_reasons")
+            )
+
             existing.system_code = (
                 anomaly.get(
                     "system_code"
@@ -574,6 +622,10 @@ def persist_anomalies(
                         "anomaly_type"
                     ]
                 ),
+
+
+                risk_score=anomaly.get("risk_score"),
+                risk_reasons=anomaly.get("risk_reasons"),
 
                 risk_level=(
                     anomaly[

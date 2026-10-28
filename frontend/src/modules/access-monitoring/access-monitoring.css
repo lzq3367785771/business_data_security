@@ -187,3 +187,28 @@
 .anomaly-resolve-button {
     color: #15803d;
 }
+
+
+.access-monitoring-risk-reasons {
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+
+    white-space: normal;
+
+    color: #475569;
+}
+
+
+.access-monitoring-risk-reasons-content {
+    max-height: 64px;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    padding-right: 6px;
+
+    line-height: 1.5;
+    white-space: normal;
+    word-break: break-word;
+}

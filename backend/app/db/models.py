@@ -174,6 +174,40 @@ class AnomalyEvent(Base):
         index=True,
     )
 
+
+    risk_score: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    risk_reasons: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+
+
+    # 风险量化分数：0 ~ 100
+    risk_score: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    # 风险解释原因
+    risk_reasons: Mapped[list | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+    # 产生该风险结果时的完整特征快照
+    risk_features: Mapped[dict | None] = mapped_column(
+        JSON,
+        nullable=True,
+    )
+
+
+
+
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id"),
         nullable=False,
