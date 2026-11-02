@@ -514,6 +514,35 @@ def main():
 
 
         # -------------------------
+        # 文件安全
+        # -------------------------
+
+        create_policy(
+            db=db,
+            name="文件加密策略",
+            resource="file_security:encrypt",
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+        create_policy(
+            db=db,
+            name="文件解密策略",
+            resource="file_security:decrypt",
+            roles=[
+                "admin",
+            ],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+
+        # -------------------------
         # 安全态势首页
         # -------------------------
 

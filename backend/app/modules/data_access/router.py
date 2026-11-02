@@ -93,12 +93,13 @@ def preview_business_table(
     """
     读取真实业务数据。
 
-    当前第一阶段：
-    - 仅管理员策略允许访问
-    - 仅支持 MySQL
+    当前能力：
+    - 仅支持 MySQL 数据源
     - 只读取已经同步进资产目录的表
-    - 最多返回 100 行
-    - 暂不执行动态脱敏
+    - 单次请求最多返回 100 行
+    - 根据访问策略和风险状态执行 ALLOW / MASK / LIMIT / BLOCK
+    - 对敏感字段执行动态脱敏
+    - 记录数据访问及风险控制审计日志
     """
 
     # =========================
@@ -128,20 +129,7 @@ def preview_business_table(
             detail="数据源不存在",
         )
 
-    # =========================
-    # 2. 数据源
-    # =========================
 
-    source = get_source_by_id(
-        db,
-        source_id,
-    )
-
-    if source is None:
-        raise HTTPException(
-            status_code=404,
-            detail="数据源不存在",
-        )
 
 
     system = get_system_by_id(

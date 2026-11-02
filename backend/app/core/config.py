@@ -45,6 +45,8 @@ class Settings(BaseSettings):
     demo_analyst_password: str = ""
 
     credential_master_key: str 
+    
+    file_master_key: str
 
     @property
     def cors_origins(self) -> list[str]:

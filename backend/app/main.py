@@ -41,6 +41,11 @@ from app.modules.dashboard.router import (
     router as dashboard_router,
 )
 
+from app.modules.file_security.router import (
+    router as file_security_router,
+)
+
+
 app = FastAPI(
     title="Business Data AI Security Platform",
     description="业务数据AI管控与溯源平台",
@@ -178,6 +183,7 @@ app.include_router(sensitive_detection_router)
 app.include_router(data_access_router)
 app.include_router(access_monitoring_router)
 app.include_router(dashboard_router)
+app.include_router(file_security_router)
 
 
 

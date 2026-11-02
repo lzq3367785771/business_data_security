@@ -274,6 +274,10 @@ def detect_frequent_raw_sensitive_access(
                 "risk_reasons":
                     risk_result["reasons"],
 
+                "risk_features":
+                    risk_result["features"],
+
+
                 "user_id":
                     group["user_id"],
 
@@ -506,6 +510,11 @@ def persist_anomalies(
                 anomaly.get("risk_reasons")
             )
 
+
+            existing.risk_features = (
+                anomaly.get("risk_features")
+            )
+
             existing.system_code = (
                 anomaly.get(
                     "system_code"
@@ -626,6 +635,12 @@ def persist_anomalies(
 
                 risk_score=anomaly.get("risk_score"),
                 risk_reasons=anomaly.get("risk_reasons"),
+
+                risk_features=anomaly.get(
+                    "risk_features"
+                ),
+
+
 
                 risk_level=(
                     anomaly[

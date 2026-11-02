@@ -9,7 +9,7 @@
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(3, minmax(0, 1fr));
 
     gap: 14px;
 }
@@ -211,4 +211,164 @@
     line-height: 1.5;
     white-space: normal;
     word-break: break-word;
+}
+
+
+
+
+.anomaly-detail-button {
+    color: #7c3aed;
+}
+
+
+.access-monitoring-detail-panel {
+    padding: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5eaf1;
+    border-radius: 10px;
+}
+
+
+.access-monitoring-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 18px;
+}
+
+
+.access-monitoring-detail-title {
+    font-size: 18px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.access-monitoring-detail-close {
+    padding: 6px 14px;
+
+    background: #ffffff;
+
+    border: 1px solid #d7dee8;
+    border-radius: 6px;
+
+    cursor: pointer;
+}
+
+
+.access-monitoring-detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+.access-monitoring-detail-item {
+    padding: 12px 14px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+}
+
+
+.access-monitoring-detail-label {
+    margin-bottom: 6px;
+
+    color: #64748b;
+    font-size: 13px;
+}
+
+
+.access-monitoring-detail-value {
+    color: #0f172a;
+    font-size: 14px;
+    font-weight: 600;
+
+    word-break: break-word;
+}
+
+
+.access-monitoring-detail-section {
+    margin-top: 16px;
+}
+
+
+.access-monitoring-detail-section-title {
+    margin-bottom: 8px;
+
+    color: #334155;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.access-monitoring-detail-list {
+    padding: 12px 14px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+
+    color: #475569;
+
+    line-height: 1.6;
+
+    word-break: break-word;
+}
+
+
+.access-monitoring-risk-features {
+    margin: 0;
+
+    padding: 14px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+
+    overflow-x: auto;
+
+    color: #334155;
+
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+.access-monitoring-evidence-list {
+    padding: 12px 14px;
+
+    background: #f8fafc;
+
+    border-radius: 8px;
+
+    color: #475569;
+
+    font-family: monospace;
+    font-size: 13px;
+
+    line-height: 1.7;
+
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+
+@media (max-width: 1000px) {
+
+    .access-monitoring-detail-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
 }

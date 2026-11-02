@@ -46,7 +46,8 @@ function createActionButton(
 export function renderAccessMonitoringTable(
     container,
     items,
-    onStatusChange
+    onStatusChange,
+    onViewDetail
 ) {
 
     container.replaceChildren();
@@ -260,6 +261,22 @@ export function renderAccessMonitoringTable(
         actionCell.className =
             "access-monitoring-actions";
 
+        const detailButton =
+            createActionButton(
+                "查看详情",
+                "anomaly-action-button anomaly-detail-button",
+                () =>
+                    onViewDetail(
+                        item
+                    )
+            );
+
+
+        actionCell.appendChild(
+            detailButton
+        );
+
+
 
         if (
             item.status === "open"
@@ -317,8 +334,8 @@ export function renderAccessMonitoringTable(
 
         } else {
 
-            actionCell.textContent =
-                "-";
+            // 已忽略、已处置事件
+            // 保留“查看详情”按钮
         }
 
 

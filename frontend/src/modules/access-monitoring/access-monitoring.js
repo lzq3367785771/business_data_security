@@ -2,6 +2,9 @@ import "./access-monitoring.css";
 
 import {
     fetchAnomalyEvents,
+    fetchAnomalySummary,
+    fetchAnomalyDetail,
+    fetchAnomalyEvidence,
     updateAnomalyStatus
 } from "./access-monitoring-api.js";
 
@@ -240,60 +243,50 @@ function buildDisplayItems(
 
 function renderStats(
     container,
-    items
+    summary
 ) {
 
-    const totalCount =
-        items.length;
+    const averageRiskScore =
+        summary.average_risk_score
+        ?? "-";
 
-
-    const highRiskCount =
-        items.filter(
-            item =>
-                item.risk_level
-                === "HIGH"
-        ).length;
-
-
-    const openCount =
-        items.filter(
-            item =>
-                item.status
-                === "open"
-        ).length;
-
-
-    const confirmedCount =
-        items.filter(
-            item =>
-                item.status
-                === "confirmed"
-        ).length;
+    const maxRiskScore =
+        summary.max_risk_score
+        ?? "-";
 
 
     container.replaceChildren(
         createStatCard(
-            totalCount,
+            summary.total_count ?? 0,
             "异常事件总数"
         ),
 
         createStatCard(
-            highRiskCount,
+            summary.high_risk_count ?? 0,
             "高风险事件"
         ),
 
         createStatCard(
-            openCount,
-            "待处理事件"
+            summary.scored_count ?? 0,
+            "已评分事件"
         ),
 
         createStatCard(
-            confirmedCount,
-            "已确认事件"
+            summary.unscored_count ?? 0,
+            "未评分事件"
+        ),
+
+        createStatCard(
+            averageRiskScore,
+            "平均风险分"
+        ),
+
+        createStatCard(
+            maxRiskScore,
+            "最高风险分"
         )
     );
 }
-
 
 
 function filterItems(
@@ -409,6 +402,37 @@ function createPage(
         "低风险"
     );
 
+    const minRiskScoreSelect =
+        createSelect(
+            "全部风险分数"
+        );
+
+
+    appendOption(
+        minRiskScoreSelect,
+        "30",
+        "≥ 30 分"
+    );
+
+    appendOption(
+        minRiskScoreSelect,
+        "50",
+        "≥ 50 分"
+    );
+
+    appendOption(
+        minRiskScoreSelect,
+        "70",
+        "≥ 70 分"
+    );
+
+    appendOption(
+        minRiskScoreSelect,
+        "90",
+        "≥ 90 分"
+    );
+
+
 
     const resetButton =
         document.createElement(
@@ -428,9 +452,9 @@ function createPage(
     toolbar.append(
         statusSelect,
         riskSelect,
+        minRiskScoreSelect,
         resetButton
     );
-
 
 
 
@@ -458,13 +482,21 @@ function createPage(
         "access-monitoring-action-hint";
 
     actionHint.textContent =
-        "点击表格中的异常事件后，可进行确认、忽略或标记已处置。";
-
+    "可查看异常详情，并对待处理事件进行确认、忽略或标记已处置。";
 
     actionPanel.append(
         actionTitle,
         actionHint
     );
+
+
+    const detailPanel =
+        document.createElement("div");
+
+    detailPanel.className =
+        "access-monitoring-detail-panel";
+
+    detailPanel.hidden = true;
 
 
     const tableContainer =
@@ -478,6 +510,7 @@ function createPage(
         stats,
         toolbar,
         actionPanel,
+        detailPanel,
         tableContainer
     );
 
@@ -490,19 +523,517 @@ function createPage(
         stats,
         statusSelect,
         riskSelect,
+        minRiskScoreSelect,
         resetButton,
         actionPanel,
+        detailPanel,
         tableContainer
     };
 }
 
+
+function renderAnomalyDetail(
+    container,
+    detail,
+    evidence
+) {
+    container.replaceChildren();
+
+    container.hidden = false;
+
+
+    const header =
+        document.createElement("div");
+
+    header.className =
+        "access-monitoring-detail-header";
+
+
+    const title =
+        document.createElement("div");
+
+    title.className =
+        "access-monitoring-detail-title";
+
+    title.textContent =
+        "异常事件详情";
+
+
+    const closeButton =
+        document.createElement("button");
+
+    closeButton.type =
+        "button";
+
+    closeButton.className =
+        "access-monitoring-detail-close";
+
+    closeButton.textContent =
+        "关闭";
+
+    closeButton.addEventListener(
+        "click",
+        () => {
+            container.hidden = true;
+        }
+    );
+
+
+    header.append(
+        title,
+        closeButton
+    );
+
+
+    const grid =
+        document.createElement("div");
+
+    grid.className =
+        "access-monitoring-detail-grid";
+
+
+    function appendDetailItem(
+        label,
+        value
+    ) {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "access-monitoring-detail-item";
+
+
+        const labelElement =
+            document.createElement("div");
+
+        labelElement.className =
+            "access-monitoring-detail-label";
+
+        labelElement.textContent =
+            label;
+
+
+        const valueElement =
+            document.createElement("div");
+
+        valueElement.className =
+            "access-monitoring-detail-value";
+
+        valueElement.textContent =
+            value === null ||
+            value === undefined ||
+            value === ""
+                ? "-"
+                : String(value);
+
+
+        item.append(
+            labelElement,
+            valueElement
+        );
+
+        grid.appendChild(
+            item
+        );
+    }
+
+
+    const statusLabels = {
+        open: "待处理",
+        confirmed: "已确认",
+        ignored: "已忽略",
+        resolved: "已处置"
+    };
+
+
+    appendDetailItem(
+        "异常类型",
+        detail.anomaly_label
+    );
+
+    appendDetailItem(
+        "风险等级",
+        detail.risk_level
+    );
+
+    appendDetailItem(
+        "风险分数",
+        detail.risk_score
+    );
+
+    appendDetailItem(
+        "状态",
+        statusLabels[
+            detail.status
+        ] || detail.status
+    );
+
+    appendDetailItem(
+        "用户",
+        detail.username
+    );
+
+    appendDetailItem(
+        "业务系统",
+        detail.system_code
+    );
+
+    appendDetailItem(
+        "数据源",
+        detail.source_code
+    );
+
+    appendDetailItem(
+        "访问对象",
+        detail.data_object
+    );
+
+    appendDetailItem(
+        "访问次数",
+        detail.access_count
+    );
+
+    appendDetailItem(
+        "检测窗口",
+        detail.window_minutes
+            ? `${detail.window_minutes} 分钟`
+            : "-"
+    );
+
+    appendDetailItem(
+        "首次访问",
+        formatTime(
+            detail.first_access_at
+        )
+    );
+
+    appendDetailItem(
+        "最后访问",
+        formatTime(
+            detail.last_access_at
+        )
+    );
+
+
+    const reasonsSection =
+        document.createElement("div");
+
+    reasonsSection.className =
+        "access-monitoring-detail-section";
+
+    const reasonsTitle =
+        document.createElement("div");
+
+    reasonsTitle.className =
+        "access-monitoring-detail-section-title";
+
+    reasonsTitle.textContent =
+        "风险原因";
+
+
+    const reasons =
+        document.createElement("div");
+
+    reasons.className =
+        "access-monitoring-detail-list";
+
+    reasons.textContent =
+        (
+            detail.risk_reasons
+            || []
+        ).join("；") || "-";
+
+
+    reasonsSection.append(
+        reasonsTitle,
+        reasons
+    );
+
+
+    const sensitiveSection =
+        document.createElement("div");
+
+    sensitiveSection.className =
+        "access-monitoring-detail-section";
+
+    const sensitiveTitle =
+        document.createElement("div");
+
+    sensitiveTitle.className =
+        "access-monitoring-detail-section-title";
+
+    sensitiveTitle.textContent =
+        "敏感数据";
+
+
+    const sensitiveContent =
+        document.createElement("div");
+
+    sensitiveContent.className =
+        "access-monitoring-detail-list";
+
+    sensitiveContent.textContent =
+        (
+            detail.sensitive_fields
+            || []
+        ).join("、") || "-";
+
+
+    sensitiveSection.append(
+        sensitiveTitle,
+        sensitiveContent
+    );
+
+
+    const featuresSection =
+        document.createElement("div");
+
+    featuresSection.className =
+        "access-monitoring-detail-section";
+
+    const featuresTitle =
+        document.createElement("div");
+
+    featuresTitle.className =
+        "access-monitoring-detail-section-title";
+
+    featuresTitle.textContent =
+        "风险特征快照";
+
+
+    const featuresContent =
+        document.createElement("pre");
+
+    featuresContent.className =
+        "access-monitoring-risk-features";
+
+    const riskFeatures =
+        detail.risk_features || {};
+
+    featuresContent.textContent =
+        Object.keys(
+            riskFeatures
+        ).length > 0
+            ? JSON.stringify(
+                riskFeatures,
+                null,
+                2
+            )
+            : "暂无风险特征快照（历史事件）";
+
+
+    featuresSection.append(
+        featuresTitle,
+        featuresContent
+    );
+
+
+
+
+
+    const timeline =
+        document.createElement("div");
+
+    timeline.className =
+        "access-monitoring-evidence-timeline";
+
+
+    const evidenceItems =
+        evidence?.items || [];
+
+
+    if (evidenceItems.length === 0) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "access-monitoring-evidence-empty";
+
+        empty.textContent =
+            "暂无可用审计证据";
+
+        timeline.appendChild(
+            empty
+        );
+
+    } else {
+
+        for (
+            const evidenceItem
+            of evidenceItems
+        ) {
+
+            const timelineItem =
+                document.createElement("div");
+
+            timelineItem.className =
+                "access-monitoring-timeline-item";
+
+
+            const marker =
+                document.createElement("div");
+
+            marker.className =
+                "access-monitoring-timeline-marker";
+
+
+            const content =
+                document.createElement("div");
+
+            content.className =
+                "access-monitoring-timeline-content";
+
+
+            const top =
+                document.createElement("div");
+
+            top.className =
+                "access-monitoring-timeline-top";
+
+
+            const time =
+                document.createElement("div");
+
+            time.className =
+                "access-monitoring-timeline-time";
+
+            time.textContent =
+                formatTime(
+                    evidenceItem.created_at
+                );
+
+
+            const result =
+                document.createElement("span");
+
+            result.className =
+                "access-monitoring-timeline-result";
+
+            result.textContent =
+                evidenceItem.result || "-";
+
+
+            if (
+                evidenceItem.result === "ALLOW"
+            ) {
+                result.classList.add(
+                    "is-allow"
+                );
+            } else {
+                result.classList.add(
+                    "is-deny"
+                );
+            }
+
+
+            top.append(
+                time,
+                result
+            );
+
+
+            const summary =
+                document.createElement("div");
+
+            summary.className =
+                "access-monitoring-timeline-summary";
+
+            const accessModeText =
+                evidenceItem.access_mode === "raw"
+                    ? "原始数据访问"
+                    : evidenceItem.access_mode === "masked"
+                        ? "脱敏数据访问"
+                        : evidenceItem.access_mode || "-";
+
+            summary.textContent =
+                `${evidenceItem.username || "-"} · ` +
+                `${accessModeText} · ` +
+                `${evidenceItem.data_object || "-"}`;
+
+
+            const metadata =
+                document.createElement("div");
+
+            metadata.className =
+                "access-monitoring-timeline-metadata";
+
+            metadata.textContent =
+                `${evidenceItem.action || "-"} · ` +
+                `返回 ${evidenceItem.object_count ?? 0} 条`;
+
+
+            const fields =
+                document.createElement("div");
+
+            fields.className =
+                "access-monitoring-timeline-fields";
+
+            const sensitiveFields =
+                evidenceItem.sensitive_fields || [];
+
+            fields.textContent =
+                sensitiveFields.length > 0
+                    ? `敏感字段：${sensitiveFields.join("、")}`
+                    : "敏感字段：-";
+
+
+            const eventId =
+                document.createElement("div");
+
+            eventId.className =
+                "access-monitoring-timeline-event-id";
+
+            eventId.textContent =
+                `证据 ID：${evidenceItem.event_id}`;
+
+
+            content.append(
+                top,
+                summary,
+                metadata,
+                fields,
+                eventId
+            );
+
+
+            timelineItem.append(
+                marker,
+                content
+            );
+
+
+            timeline.appendChild(
+                timelineItem
+            );
+        }
+    }
+
+
+    evidenceSection.append(
+        evidenceHeader,
+        timeline
+    );
+
+
+    container.append(
+        header,
+        grid,
+        reasonsSection,
+        sensitiveSection,
+        featuresSection,
+        evidenceSection
+    );
+}
 
 
 function renderPageData(
     refs,
     items,
     filters,
-    onStatusChange
+    onStatusChange,
+    onViewDetail
 ) {
 
     const filteredItems =
@@ -521,7 +1052,8 @@ function renderPageData(
     renderAccessMonitoringTable(
         refs.tableContainer,
         displayItems,
-        onStatusChange
+        onStatusChange,
+        onViewDetail
     );
 
 
@@ -551,10 +1083,16 @@ export async function loadAccessMonitoring(
         );
 
 
-    const data =
-        await fetchAnomalyEvents({
+    const [
+        data,
+        summary
+    ] = await Promise.all([
+        fetchAnomalyEvents({
             limit: 100
-        });
+        }),
+
+        fetchAnomalySummary()
+    ]);
 
 
     let items =
@@ -563,13 +1101,14 @@ export async function loadAccessMonitoring(
 
     const filters = {
         status: "",
-        riskLevel: ""
+        riskLevel: "",
+        minRiskScore: ""
     };
 
 
     renderStats(
         refs.stats,
-        items
+        summary
     );
 
 
@@ -577,12 +1116,45 @@ export async function loadAccessMonitoring(
         refs,
         items,
         filters,
-        handleStatusChange
+        handleStatusChange,
+        handleViewDetail
     );
 
 
     statusMessage.textContent =
         `共加载 ${items.length} 条异常事件`;
+
+
+async function handleViewDetail(
+    item
+) {
+
+    statusMessage.textContent =
+        "正在加载异常事件详情...";
+
+    try {
+
+        const detail =
+            await fetchAnomalyDetail(
+                item.anomaly_id
+            );
+
+
+        renderAnomalyDetail(
+            refs.detailPanel,
+            detail
+        );
+
+
+        statusMessage.textContent =
+            "异常事件详情加载成功";
+
+    } catch (error) {
+
+        statusMessage.textContent =
+            `异常事件详情加载失败：${error.message}`;
+    }
+}
 
 
 
@@ -627,21 +1199,37 @@ async function handleStatusChange(
 
 
         // 更新以后重新从后端获取
-        const refreshed =
-            await fetchAnomalyEvents({
+        const [
+            refreshed,
+            refreshedSummary
+        ] = await Promise.all([
+            fetchAnomalyEvents({
+                status:
+                    filters.status,
+
+                riskLevel:
+                    filters.riskLevel,
+
+                minRiskScore:
+                    filters.minRiskScore,
+
                 limit: 100
-            });
+            }),
+
+            fetchAnomalySummary()
+        ]);
 
 
         items =
             refreshed.items || [];
 
 
-        // 统计卡片重新计算
         renderStats(
             refs.stats,
-            items
+            refreshedSummary
         );
+
+
 
 
         const count =
@@ -649,9 +1237,9 @@ async function handleStatusChange(
                 refs,
                 items,
                 filters,
-                handleStatusChange
+                handleStatusChange,
+                handleViewDetail
             );
-
 
         statusMessage.textContent =
             `异常事件状态更新成功，当前显示 ${count} 条`;
@@ -681,7 +1269,8 @@ async function handleStatusChange(
                     refs,
                     items,
                     filters,
-                    handleStatusChange
+                    handleStatusChange,
+                    handleViewDetail
                 );
 
             statusMessage.textContent =
@@ -707,7 +1296,8 @@ async function handleStatusChange(
                     refs,
                     items,
                     filters,
-                    handleStatusChange
+                    handleStatusChange,
+                    handleViewDetail
                 );
 
             statusMessage.textContent =
@@ -718,31 +1308,107 @@ async function handleStatusChange(
 
 
     // =========================
+    // 最低风险分数筛选
+    // =========================
+
+    refs.minRiskScoreSelect.addEventListener(
+        "change",
+        async event => {
+
+            filters.minRiskScore =
+                event.target.value;
+
+            statusMessage.textContent =
+                "正在筛选风险事件...";
+
+            try {
+
+                const refreshed =
+                    await fetchAnomalyEvents({
+                        minRiskScore:
+                            filters.minRiskScore,
+                        limit: 100
+                    });
+
+                items =
+                    refreshed.items || [];
+
+
+
+                const count =
+                    renderPageData(
+                        refs,
+                        items,
+                        filters,
+                        handleStatusChange,
+                        handleViewDetail
+                    );
+
+                statusMessage.textContent =
+                    `共加载 ${items.length} 条异常事件，` +
+                    `当前显示 ${count} 条`;
+
+            } catch (error) {
+
+                statusMessage.textContent =
+                    `风险分数筛选失败：${error.message}`;
+            }
+        }
+    );
+
+
+
+
+    
+
+    // =========================
     // 重置筛选
     // =========================
 
     refs.resetButton.addEventListener(
         "click",
-        () => {
+        async () => {
 
             filters.status = "";
             filters.riskLevel = "";
+            filters.minRiskScore = "";
 
             refs.statusSelect.value = "";
             refs.riskSelect.value = "";
-
-
-            const count =
-                renderPageData(
-                    refs,
-                    items,
-                    filters,
-                    handleStatusChange
-                );
+            refs.minRiskScoreSelect.value = "";
 
             statusMessage.textContent =
-                `共加载 ${items.length} 条异常事件，` +
-                `当前显示 ${count} 条`;
+                "正在重置筛选...";
+
+            try {
+
+                const refreshed =
+                    await fetchAnomalyEvents({
+                        limit: 100
+                    });
+
+                items =
+                    refreshed.items || [];
+
+
+
+                const count =
+                    renderPageData(
+                        refs,
+                        items,
+                        filters,
+                        handleStatusChange,
+                        handleViewDetail
+                    );
+
+                statusMessage.textContent =
+                    `筛选已重置，共加载 ${count} 条异常事件`;
+
+            } catch (error) {
+
+                statusMessage.textContent =
+                    `重置筛选失败：${error.message}`;
+            }
         }
     );
 }

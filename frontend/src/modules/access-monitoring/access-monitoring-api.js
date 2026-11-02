@@ -7,6 +7,7 @@ export async function fetchAnomalyEvents(
     {
         status = "",
         riskLevel = "",
+        minRiskScore = "",
         limit = 100
     } = {}
 ) {
@@ -28,6 +29,19 @@ export async function fetchAnomalyEvents(
         );
     }
 
+    if (
+        minRiskScore !== "" &&
+        minRiskScore !== null &&
+        minRiskScore !== undefined
+    ) {
+        params.set(
+            "min_risk_score",
+            String(minRiskScore)
+        );
+    }
+
+
+
     params.set(
         "limit",
         String(limit)
@@ -38,6 +52,34 @@ export async function fetchAnomalyEvents(
         `/access-monitoring/events?${params.toString()}`
     );
 }
+
+export async function fetchAnomalySummary() {
+
+    return apiRequest(
+        "/access-monitoring/events/summary"
+    );
+}
+
+
+export async function fetchAnomalyDetail(
+    anomalyId
+) {
+
+    return apiRequest(
+        `/access-monitoring/events/${anomalyId}`
+    );
+}
+
+
+export async function fetchAnomalyEvidence(
+    anomalyId
+) {
+
+    return apiRequest(
+        `/access-monitoring/events/${anomalyId}/evidence`
+    );
+}
+
 
 
 export async function updateAnomalyStatus(
