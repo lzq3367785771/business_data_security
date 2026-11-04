@@ -1,0 +1,196 @@
+.file-security-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+
+.file-security-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 16px 18px;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 8px;
+
+    background: #f7f9fc;
+
+    line-height: 1.6;
+}
+
+
+.file-security-notice strong {
+    font-size: 15px;
+}
+
+
+.file-security-notice span {
+    color: #667085;
+    font-size: 14px;
+}
+
+
+.file-security-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 20px;
+}
+
+
+.file-security-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    min-height: 300px;
+
+    padding: 22px;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 10px;
+
+    background: #ffffff;
+}
+
+
+.file-security-card-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.file-security-card-header h3 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 600;
+
+    color: #101828;
+}
+
+
+.file-security-card-header p {
+    margin: 0;
+
+    color: #667085;
+
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+
+.file-security-file-input {
+    width: 100%;
+
+    padding: 10px;
+
+    border: 1px solid #d0d5dd;
+    border-radius: 6px;
+
+    background: #ffffff;
+}
+
+
+.file-security-file-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding: 12px 14px;
+
+    border-radius: 6px;
+
+    background: #f9fafb;
+
+    color: #475467;
+
+    font-size: 13px;
+
+    word-break: break-all;
+}
+
+
+.file-security-primary-button {
+    align-self: flex-start;
+
+    min-width: 120px;
+
+    padding: 9px 16px;
+
+    border: 0;
+    border-radius: 6px;
+
+    background: #155eef;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.file-security-primary-button:hover:not(
+    :disabled
+) {
+    opacity: 0.9;
+}
+
+
+.file-security-primary-button:disabled {
+    cursor: not-allowed;
+
+    opacity: 0.55;
+}
+
+
+.file-security-result {
+    white-space: pre-wrap;
+
+    padding: 12px 14px;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+    line-height: 1.6;
+
+    word-break: break-all;
+}
+
+
+.file-security-result-success {
+    border: 1px solid #abefc6;
+
+    background: #ecfdf3;
+
+    color: #067647;
+}
+
+
+.file-security-result-error {
+    border: 1px solid #fecdca;
+
+    background: #fef3f2;
+
+    color: #b42318;
+}
+
+
+@media (
+    max-width: 900px
+) {
+
+    .file-security-grid {
+        grid-template-columns:
+            1fr;
+    }
+}
