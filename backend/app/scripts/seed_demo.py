@@ -542,6 +542,29 @@ def main():
         )
 
 
+        # 文件脱敏预览策略
+        create_policy(
+            db=db,
+            name="文件脱敏预览策略",
+            resource="file_masking:preview",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+        # 文件脱敏执行策略
+        create_policy(
+            db=db,
+            name="文件脱敏执行策略",
+            resource="file_masking:mask",
+            roles=["admin"],
+            mask_fields=[],
+            priority=100,
+            update_existing=True,
+        )
+
+
         # -------------------------
         # 安全态势首页
         # -------------------------
