@@ -34,9 +34,13 @@ import {
     loadDashboard
 } from "../modules/dashboard/dashboard.js";
 
+import {
+    loadFileSecurity
+} from "../modules/file-security/file-security.js";
 
-
-
+import {
+    loadFileMasking
+} from "../modules/file-masking/file-masking.js";
 
 
 
@@ -120,6 +124,28 @@ export const viewRegistry = {
 
         load: loadAccessMonitoring
     },
+
+
+    fileSecurity: {
+        title: "文件安全",
+
+        description:
+            "对业务文件进行加密保护与安全恢复",
+
+        load: loadFileSecurity
+    },
+
+
+
+    fileMasking: {
+        title: "文件脱敏",
+
+        description:
+            "识别 CSV / XLSX 敏感字段并生成脱敏文件副本",
+
+        load: loadFileMasking
+    },
+
 
 
     audit: {
