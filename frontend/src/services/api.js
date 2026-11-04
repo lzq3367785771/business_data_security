@@ -162,3 +162,228 @@ export async function apiRequest(
 
     return result.data;
 }
+
+
+
+
+
+/*
+ * multipart/form-data 请求，
+ * 成功响应为统一 JSON。
+ *
+ * 用于：
+ * - 文件脱敏预览
+ *
+ * 注意：
+ * 不手动设置 Content-Type，
+ * 浏览器会自动生成 multipart boundary。
+ */
+export async function apiFormRequest(
+    path,
+    formData,
+    {
+        method = "POST"
+    } = {}
+) {
+
+    const headers = {};
+
+
+    if (accessToken) {
+
+        headers["Authorization"] =
+            `Bearer ${accessToken}`;
+    }
+
+
+    let response;
+
+    try {
+
+        response = await fetch(
+            `${API_BASE_URL}/api/v1${path}`,
+            {
+                method,
+                headers,
+                body: formData
+            }
+        );
+
+    } catch (error) {
+
+        throw new Error(
+            "无法连接后端服务，请确认 FastAPI 已在 127.0.0.1:8000 运行"
+        );
+    }
+
+
+    let result;
+
+    try {
+
+        result =
+            await response.json();
+
+    } catch (error) {
+
+        throw new Error(
+            `后端返回了无法解析的数据，HTTP ${response.status}`
+        );
+    }
+
+
+    if (
+        !response.ok ||
+        result.code !== 0
+    ) {
+
+        if (
+            response.status === 401
+        ) {
+            accessToken = null;
+        }
+
+
+        const requestError =
+            new Error(
+                result?.message ||
+                result?.detail ||
+                `请求失败，HTTP ${response.status}`
+            );
+
+
+        requestError.status =
+            response.status;
+
+        requestError.data =
+            result?.data || null;
+
+        requestError.requestId =
+            result?.request_id || null;
+
+
+        throw requestError;
+    }
+
+
+    return result.data;
+}
+
+
+
+/*
+ * 文件上传 / 二进制下载请求。
+ *
+ * 用于：
+ * - 文件加密
+ * - 文件解密
+ *
+ * 注意：
+ * FormData 请求不能手动设置 Content-Type，
+ * 浏览器需要自动补充 multipart boundary。
+ */
+export async function apiFileRequest(
+    path,
+    formData,
+    {
+        method = "POST"
+    } = {}
+) {
+
+    const headers = {};
+
+
+    /*
+     * 自动携带 JWT
+     */
+    if (accessToken) {
+
+        headers["Authorization"] =
+            `Bearer ${accessToken}`;
+    }
+
+
+    let response;
+
+    try {
+
+        response = await fetch(
+            `${API_BASE_URL}/api/v1${path}`,
+            {
+                method,
+                headers,
+                body: formData
+            }
+        );
+
+    } catch (error) {
+
+        throw new Error(
+            "无法连接后端服务，请确认 FastAPI 已在 127.0.0.1:8000 运行"
+        );
+    }
+
+
+    /*
+     * 文件接口失败时，
+     * 后端仍然返回统一 JSON 错误。
+     */
+    if (!response.ok) {
+
+        let result = null;
+
+        try {
+
+            result =
+                await response.json();
+
+        } catch (error) {
+
+            result = null;
+        }
+
+
+        if (
+            response.status === 401
+        ) {
+            accessToken = null;
+        }
+
+
+        const requestError =
+            new Error(
+                result?.message ||
+                `文件请求失败，HTTP ${response.status}`
+            );
+
+
+        requestError.status =
+            response.status;
+
+        requestError.data =
+            result?.data || null;
+
+        requestError.requestId =
+            result?.request_id || null;
+
+
+        throw requestError;
+    }
+
+
+    /*
+     * 成功响应为二进制文件
+     */
+    const blob =
+        await response.blob();
+
+
+    return {
+        blob,
+        headers:
+            response.headers,
+
+        status:
+            response.status
+    };
+}
