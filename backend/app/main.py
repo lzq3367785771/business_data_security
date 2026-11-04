@@ -45,6 +45,10 @@ from app.modules.file_security.router import (
     router as file_security_router,
 )
 
+from app.modules.file_masking.router import (
+    router as file_masking_router,
+)
+
 
 app = FastAPI(
     title="Business Data AI Security Platform",
@@ -69,7 +73,15 @@ app.add_middleware(
         "Authorization",
         "Content-Type",
         "X-Request-ID"
-    ]
+    ],
+
+    expose_headers=[
+        "Content-Disposition",
+        "X-Original-SHA256",
+        "X-File-SHA256",
+        "X-Request-ID",
+    ],
+
 )
 
 
@@ -184,7 +196,7 @@ app.include_router(data_access_router)
 app.include_router(access_monitoring_router)
 app.include_router(dashboard_router)
 app.include_router(file_security_router)
-
+app.include_router(file_masking_router)
 
 
 @app.get("/api/v1/health", tags=["System"])
